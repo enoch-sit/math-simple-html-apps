@@ -218,11 +218,6 @@ document.onkeydown = function(e) {
      // 更新正確合併列的數線
      let bar3Row = document.getElementById('bar3-row');
      if (bar3Row && bar3Row.style.display !== 'none') {
-         let wrap3 = document.getElementById('bar3-wrap');
-         const showNL = document.getElementById('show-nl-cb').checked;
-         if (showNL) wrap3.classList.add('continuous');
-         else wrap3.classList.remove('continuous');
-         
          if (isCommonDenomReady) {
              renderBar3NumberLine(cd1);
          }
@@ -464,8 +459,7 @@ document.onkeydown = function(e) {
      }
 
      if(wrap) {
-         if (showNL) wrap.classList.add('continuous');
-         else wrap.classList.remove('continuous');
+         wrap.classList.add('continuous');
 
          if (action === 'none') {
              wrap.innerHTML = '';
@@ -960,9 +954,7 @@ document.onkeydown = function(e) {
          wrap3.style.backgroundColor = '#fafafa';
          wrap3.innerHTML = '';
          
-         const showNL = document.getElementById('show-nl-cb').checked;
-         if (showNL) wrap3.classList.add('continuous');
-         else wrap3.classList.remove('continuous');
+         wrap3.classList.add('continuous');
          
          for (let i = 0; i < maxW; i++) {
              let unit = document.createElement('div');

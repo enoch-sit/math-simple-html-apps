@@ -238,8 +238,7 @@ function renderBar(num, action = 'none', old_s = 1) {
     }
 
     if(wrap) {
-        if (showNL) wrap.classList.add('continuous');
-        else wrap.classList.remove('continuous');
+        wrap.classList.add('continuous');
 
         if (action === 'none') {
             wrap.innerHTML = '';
@@ -354,11 +353,6 @@ function checkCommonDenom() {
         }
         document.getElementById('drag-instruction').innerHTML = `💡 試著點擊「擴/約分」讓兩個分數的分母相同！`;
         document.getElementById('bar3-row').style.display = 'none';
-        
-        if(!document.getElementById('show-nl-cb').checked) {
-            document.getElementById('bar1-wrap').classList.remove('continuous');
-            document.getElementById('bar2-wrap').classList.remove('continuous');
-        }
     }
 }
 

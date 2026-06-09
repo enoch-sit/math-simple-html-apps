@@ -131,12 +131,7 @@ function toggleNumberLine() {
     renderNumberLine('bar1-nl', maxW, currentNL_D);
     
     let wrap = document.getElementById('main-bar-wrap');
-    const showNL = document.getElementById('show-nl-cb').checked;
-    if (showNL) {
-        wrap.classList.add('continuous');
-    } else {
-        wrap.classList.remove('continuous');
-    }
+    wrap.classList.add('continuous');
 }
 
 function getSafeValues() {

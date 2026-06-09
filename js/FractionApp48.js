@@ -50,20 +50,14 @@ function updateSpeed() {
 function toggleNumberLine() {
     const showNL = document.getElementById('show-nl-cb').checked;
     ['bar1', 'bar2', 'error', 'final'].forEach(prefix => {
-        let wrap = document.getElementById(prefix === 'error' ? 'error-bar-wrap' : (prefix === 'final' ? 'final-wrap' : `${prefix}-wrap`));
         let nlWrap = document.getElementById(prefix === 'error' ? 'error-nl-wrap' : (prefix === 'final' ? 'final-nl' : `${prefix}-nl`));
         
-        if (wrap) {
-            if (showNL) wrap.classList.add('continuous');
-            else wrap.classList.remove('continuous');
-        }
         if (nlWrap && nlWrap.innerHTML.trim() !== '') {
             if (showNL) {
                 nlWrap.style.display = 'flex';
                 nlWrap.classList.add('continuous');
             } else {
                 nlWrap.style.display = 'none';
-                nlWrap.classList.remove('continuous');
             }
         }
     });
@@ -247,7 +241,7 @@ function renderBar(num, action = 'none', old_s = 1) {
     if(label) label.innerHTML = getDisplayHtml(w, n * s, d * s, color);
 
     if(wrap) {
-        if (showNL) wrap.classList.add('continuous'); else wrap.classList.remove('continuous');
+        wrap.classList.add('continuous');
         if (action === 'none') {
             wrap.innerHTML = '';
             for (let i = 0; i < maxW; i++) {
@@ -283,8 +277,9 @@ function renderBar(num, action = 'none', old_s = 1) {
             nlUnit.innerHTML = labelsHtml;
             nlWrap.appendChild(nlUnit);
         }
-        if (showNL) { nlWrap.style.display = 'flex'; nlWrap.classList.add('continuous'); } 
-        else { nlWrap.style.display = 'none'; nlWrap.classList.remove('continuous'); }
+        nlWrap.classList.add('continuous');
+        if (showNL) { nlWrap.style.display = 'flex'; } 
+        else { nlWrap.style.display = 'none'; }
     }
 
     if (action !== 'none') {
@@ -376,8 +371,9 @@ function showErrorMergeBar() {
         nlWrap.appendChild(nlUnit);
     }
 
-    if (showNL) { wrap.classList.add('continuous'); nlWrap.classList.add('continuous'); nlWrap.style.display = 'flex'; } 
-    else { wrap.classList.remove('continuous'); nlWrap.classList.remove('continuous'); nlWrap.style.display = 'none'; }
+    wrap.classList.add('continuous'); nlWrap.classList.add('continuous');
+    if (showNL) { nlWrap.style.display = 'flex'; } 
+    else { nlWrap.style.display = 'none'; }
 }
 
 function showFinalAnswerBar() {
@@ -410,8 +406,9 @@ function showFinalAnswerBar() {
         nlUnit.innerHTML = labelsHtml; nlWrap.appendChild(nlUnit);
     }
 
-    if (showNL) { wrap.classList.add('continuous'); nlWrap.classList.add('continuous'); nlWrap.style.display = 'flex'; } 
-    else { wrap.classList.remove('continuous'); nlWrap.classList.remove('continuous'); nlWrap.style.display = 'none'; }
+    wrap.classList.add('continuous'); nlWrap.classList.add('continuous');
+    if (showNL) { nlWrap.style.display = 'flex'; } 
+    else { nlWrap.style.display = 'none'; }
     area.style.display = 'flex'; setTimeout(() => { area.style.opacity = '1'; }, 50);
 }
 
