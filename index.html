@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分數教學工具</title>
+    <link rel="stylesheet" href="css/nav.css">
+    <style>
+        body {
+            font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            padding: 30px 20px;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .app-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        .app-card:hover {
+            border-color: #3498db;
+            background: #f0f8ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52,152,219,0.15);
+        }
+        .app-card .icon {
+            font-size: 1.5rem;
+        }
+        .section-title {
+            margin-top: 25px;
+            margin-bottom: 10px;
+            font-size: 1rem;
+            color: #7f8c8d;
+            font-weight: bold;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="header-left">
+            <div class="title-badge">分數教學工具</div>
+        </div>
+    </div>
+
+    <div class="section-title">四則運算</div>
+    <div class="app-grid">
+        <a class="app-card" href="FractionApp47(Addition).html">
+            <span class="icon">➕</span> 異分母分數加法
+        </a>
+        <a class="app-card" href="FractionApp48(Subtraction).html">
+            <span class="icon">➖</span> 異分母分數減法
+        </a>
+        <a class="app-card" href="FractionApp45(Multiplication).html">
+            <span class="icon">✖️</span> 分數乘法
+        </a>
+        <a class="app-card" href="FractionApp38(Division).html">
+            <span class="icon">➗</span> 異分母分數除法
+        </a>
+    </div>
+
+    <div class="section-title">分數概念</div>
+    <div class="app-grid">
+        <a class="app-card" href="FractionApp59(分數比較).html">
+            <span class="icon">⚖️</span> 分數比較
+        </a>
+        <a class="app-card" href="FractionApp64(相等分數).html">
+            <span class="icon">🟰</span> 相等分數
+        </a>
+        <a class="app-card" href="FractionApp66(整數與分數互換).html">
+            <span class="icon">🔄</span> 整數與分數互換
+        </a>
+        <a class="app-card" href="FractionApp65(整數的部份).html">
+            <span class="icon">🔢</span> 整數的部份
+        </a>
+    </div>
+</div>
+
+</body>
+</html>
