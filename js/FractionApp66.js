@@ -67,8 +67,7 @@ function setMode(mode) {
 function updateUI() {
     let wholeStr = document.getElementById('inputWhole').value;
     let whole = parseInt(wholeStr);
-    if (whole <= 0) { whole = 1; document.getElementById('inputWhole').value = 1; }
-    else if (isNaN(whole)) { whole = 1; } 
+    if (isNaN(whole) || whole < 0) { whole = 1; document.getElementById('inputWhole').value = 1; }
     else if (whole > 100) { whole = 100; document.getElementById('inputWhole').value = 100; }
 
     let numStr = document.getElementById('inputNum').value;
@@ -106,19 +105,28 @@ function handleCellClick(clickedTotalCells, d) {
     const fracPart = document.getElementById('fractionPart');
 
     if (wholeInp.style.display === 'none') {
-        wholeInp.value = 1;
+        // Fraction mode: numerator = total cells clicked
         numInp.value = clickedTotalCells;
     } else if (fracPart.style.display === 'none') {
+        // Integer mode: round up to nearest whole
         let w = Math.ceil(clickedTotalCells / d);
-        wholeInp.value = w > 0 ? w : 1;
-        numInp.value = 1;
+        wholeInp.value = Math.max(w, 1);
     } else {
+        // Mixed mode: whole + remainder
         let w = Math.floor(clickedTotalCells / d);
         let n = clickedTotalCells % d;
-        if (w < 1) w = 1;
-        if (n < 1) n = 1;
-        wholeInp.value = w;
-        numInp.value = n;
+        
+        if (n === 0) {
+            // Clicked exactly on a whole boundary (e.g. at "1" or "2")
+            wholeInp.value = w;
+            numInp.value = 1;
+        } else {
+            wholeInp.value = w;
+            numInp.value = n;
+        }
+    }
+    updateUI();
+}
     }
     updateUI();
 }
