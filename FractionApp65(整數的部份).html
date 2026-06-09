@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>整數的部份</title>
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/FractionApp65.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="header-left">
+            <div class="title-badge">整數的部份</div>
+        </div>
+        <div class="header-right">
+            <button id="toggleModeBtn" class="lang-btn btn-active-mode" onclick="toggleMode()">切換至模式 2 (顯示所有排列)</button>
+        </div>
+    </div>
+
+    <div class="input-section">
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <div class="hint" style="margin-bottom: 10px;">輸入一個整數</div>
+            <input type="number" id="mainNum" class="math-box" min="1" max="999" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+        </div>
+
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <div id="formula-container">
+                <div class="formula-row" id="single-row" onclick="handleArrange(this)">
+                    <span class="symbol-equals">=</span>
+                    <input type="number" class="math-box small factor1" min="1" 
+                        onkeypress="return event.charCode >= 48 && event.charCode <= 57" 
+                        onchange="handleArrange(this.parentElement)" 
+                        onclick="event.stopPropagation()">
+                    <span class="symbol">×</span>
+                    <input type="number" class="math-box small factor2" min="1" 
+                        onkeypress="return event.charCode >= 48 && event.charCode <= 57" 
+                        onchange="handleArrange(this.parentElement)" 
+                        onclick="event.stopPropagation()">
+                    <button class="swap-btn" onclick="swapValues(event, this)" title="交換數字">⇄</button>
+                    <button class="next-btn" onclick="nextFactorPair(event)" title="下一個因數組合">⏭</button>
+                    <span class="status-indicator"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="circle-container"></div>
+</div>
+
+<script src="js/FractionApp65.js"></script>
+</body>
+</html>

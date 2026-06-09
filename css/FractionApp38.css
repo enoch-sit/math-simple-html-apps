@@ -1,0 +1,19 @@
+/* FractionApp38.css - app-specific overrides only.
+   Shared rules live in arith-common.css (loaded first). */
+
+.drag-block:hover {
+    box-shadow: 0 0 10px rgba(231, 76, 60, 0.6);
+    z-index: 15;
+}
+
+@media (max-width: 768px) {
+    .container { padding: 15px; }
+        .formula { font-size: 1.5rem; }
+        .whole-input { width: 35px; height: 40px; font-size: 1.4rem; }
+        .frac-input { width: 45px; height: 35px; font-size: 1.2rem; }
+        .instruction-text, .word-problem { font-size: 1.1rem; padding: 12px 15px; flex-wrap: wrap; }
+        #bar1-row, #bar2-row, #bar3-row { flex-direction: column; height: auto !important; gap: 10px; padding-bottom: 10px; }
+        .bars-column { width: 100% !important; }
+        .bar-wrap-container, .nl-wrap-container { justify-content: flex-start; }
+        .bar-unit, .nl-unit { min-width: 80px; }
+}

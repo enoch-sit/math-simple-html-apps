@@ -1,0 +1,176 @@
+/* bar-component.css
+   Shared design tokens and typography for ALL bar/number-line visualizations.
+   
+   This file provides visual consistency across apps that use different DOM
+   structures for their bar + number line components. It defines:
+   
+   1. Design tokens (CSS custom properties) for bar appearance
+   2. Shared fraction-label typography (.stacked-fraction, .nl-frac, .disp-frac)
+   3. Shared number-line label styles
+   
+   Each app still keeps its own structural CSS (layout, positioning, sizing).
+   This file only overrides look & feel values to create a unified visual language.
+   
+   Load order: this file should come AFTER app-specific structure CSS so that
+   app structural rules are preserved, and token overrides take effect.
+   
+   Apps covered:
+   - 38/45/47/48 (arithmetic): .bar-unit, .bar-fill, .abs-thick-line, .nl-wrap-container
+   - 59 (分數比較): .bar-container, .bar-fill, .divider-thick/.divider-thin, .number-line-*
+   - 64 (相等分數): same as 59 + .anim-line
+   - 66 (整數與分數互換): now uses .bar-unit, .bar-fill, .abs-thin-line (same as arithmetic)
+*/
+
+/* ===== DESIGN TOKENS ===== */
+:root {
+    /* Bar frame */
+    --bar-border-color: #2c3e50;
+    --bar-border-width: 2px;
+    --bar-border-radius: 6px;
+    --bar-bg: #f5f5f5;
+    
+    /* Bar fill */
+    --bar-fill-opacity: 0.8;
+    --bar-fill-transition: width 0.4s ease;
+    
+    /* Grid lines */
+    --grid-thick-width: 3px;
+    --grid-thick-color: #2c3e50;
+    --grid-thin-width: 1px;
+    --grid-thin-color: rgba(44, 62, 80, 0.5);
+    
+    /* Number line */
+    --nl-axis-color: #2c3e50;
+    --nl-axis-height: 2px;
+    --nl-tick-color: #2c3e50;
+    --nl-tick-width: 2px;
+    --nl-tick-height: 12px;
+    --nl-tick-major-height: 18px;
+    --nl-tick-major-width: 3px;
+    
+    /* Fraction labels (used across all number lines and bar labels) */
+    --frac-label-size: 0.85rem;
+    --frac-label-color: #000;
+    --frac-label-weight: bold;
+    --frac-line-height: 1.5px;
+    --frac-line-color: #2c3e50;
+}
+
+
+/* ===== ARITHMETIC APPS (38/45/47/48) — token application ===== */
+
+.bar-unit {
+    border-width: var(--bar-border-width);
+    border-color: var(--bar-border-color);
+    border-radius: var(--bar-border-radius);
+    background: var(--bar-bg);
+}
+
+.bar-wrap-container .bar-fill {
+    opacity: var(--bar-fill-opacity);
+    transition: var(--bar-fill-transition);
+}
+
+.abs-thick-line {
+    width: var(--grid-thick-width);
+    background: var(--grid-thick-color);
+}
+
+.abs-thin-line {
+    width: var(--grid-thin-width);
+    background: var(--grid-thin-color);
+}
+
+.bar-wrap-container.continuous .bar-unit:last-child {
+    border-right-width: var(--bar-border-width);
+    border-right-color: var(--bar-border-color);
+}
+
+
+/* ===== APPS 59/64 — token application ===== */
+
+.bar-container {
+    border-width: var(--bar-border-width);
+    border-color: var(--bar-border-color);
+    border-radius: var(--bar-border-radius);
+    background: var(--bar-bg);
+}
+
+.bar-container .bar-fill {
+    opacity: var(--bar-fill-opacity);
+    transition: var(--bar-fill-transition);
+}
+
+.divider-thick {
+    flex-basis: var(--grid-thick-width);
+    background: var(--grid-thick-color);
+}
+
+.divider-thin {
+    flex-basis: var(--grid-thin-width);
+    background: var(--grid-thin-color);
+}
+
+
+/* ===== APP 66 — now uses same bar-unit structure as arithmetic apps ===== */
+
+
+/* ===== SHARED NUMBER LINE TOKENS ===== */
+
+/* Tick-axis number lines (apps 59, 64) — reinforces number-line.css with tokens */
+.nl-line {
+    background: var(--nl-axis-color);
+    height: var(--nl-axis-height);
+}
+
+.nl-tick {
+    width: var(--nl-tick-width);
+    height: var(--nl-tick-height);
+    background: var(--nl-tick-color);
+}
+
+.nl-tick.major {
+    height: var(--nl-tick-major-height);
+    width: var(--nl-tick-major-width);
+}
+
+
+/* ===== SHARED FRACTION LABEL TYPOGRAPHY ===== */
+/* 
+   Multiple apps render stacked fractions with different class names:
+   - Arithmetic apps (in-bar labels): .inline-frac span, .inline-frac .line
+   - Apps 59/64 (number line labels): .nl-frac, .nl-num, .nl-den, .nl-line-frac
+   - App 59 (bar labels): .disp-frac, .disp-num, .disp-den
+   - App 66 (bar labels): .stacked-fraction, .stacked-fraction .num/.den
+   
+   We standardize the visual appearance with consistent font, weight, line-bar:
+*/
+
+.nl-frac,
+.disp-frac,
+.stacked-fraction {
+    font-size: var(--frac-label-size);
+    font-weight: var(--frac-label-weight);
+    line-height: 1.1;
+}
+
+.nl-line-frac,
+.stacked-fraction .num {
+    border-bottom-color: var(--frac-line-color);
+}
+
+.nl-label {
+    color: var(--frac-label-color);
+    font-weight: var(--frac-label-weight);
+}
+
+/* Consistent fraction divider line appearance */
+.nl-line-frac {
+    height: var(--frac-line-height);
+    background: var(--frac-line-color);
+}
+
+.stacked-fraction .num {
+    border-bottom-width: var(--frac-line-height);
+    border-bottom-style: solid;
+}

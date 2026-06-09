@@ -1,0 +1,82 @@
+:root { 
+    --primary: #3498db; 
+    --accent: #8e44ad; 
+    --success: #27ae60; 
+    --red: #e74c3c; 
+    --gray: #95a5a6; 
+    --grid-dark: #333; 
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'PingFang HK', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif; background: linear-gradient(135deg, #e0f7fa 0%, #fff9c4 100%); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+.container { background: white; padding: 1.5rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); max-width: 900px; width: 100%; }
+
+/* Nav bar styles now in nav.css */
+select.lang-btn { appearance: none; padding-right: 30px; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 10px center; }
+
+/* 數值輸入區 (中間) - 加入 min-height 確保高度固定 */
+.math-engine { position: relative; display: flex; align-items: center; justify-content: center; gap: 20px; margin: 15px 0 30px 0; padding: 30px 15px 45px 15px; border-radius: 20px; background: #fdfdfd; border: 2px solid #eee; flex-wrap: wrap; min-height: 200px; }
+
+.input-card { position: relative; display: flex; align-items: center; justify-content: center; background: #fff; padding: 15px 25px; border-radius: 12px; border: 3px solid #ccc; box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: context-menu; touch-action: none; user-select: none; transition: 0.2s; min-height: 120px; }
+.input-card:hover { border-color: #bbb; }
+
+.fraction-group { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.mixed-group { display: flex; align-items: center; gap: 10px; }
+.fraction-line { width: 100%; height: 4px; background: var(--grid-dark); border-radius: 2px; }
+
+/* 封裝好的加減輸入元件 */
+.input-wrapper { display: flex; align-items: center; border-radius: 8px; background: white; overflow: hidden; height: 45px; border: 2px solid #ccc; box-sizing: border-box; width: 75px; }
+.input-wrapper.wrapper-w { width: 85px; height: 60px; }
+.input-wrapper input { flex: 1; width: 100%; height: 100%; border: none; outline: none; text-align: center; font-size: 1.5rem; font-weight: bold; background: transparent; -moz-appearance: textfield; color: #333; padding: 0; }
+.input-wrapper.wrapper-w input { font-size: 2rem; }
+.input-wrapper input::-webkit-inner-spin-button, .input-wrapper input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+.stepper-btn-group { display: flex; flex-direction: column; height: 100%; width: 26px; border-left: 2px solid #eee; flex-shrink: 0; }
+.step-btn { height: 50%; width: 100%; border: none; background: #f8f9fa; color: #666; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; user-select: none; }
+.step-btn:active { background: #e2e6ea; }
+.step-btn.up { border-bottom: 2px solid #eee; }
+
+/* 右鍵/長按選單 */
+.context-menu { position: absolute; background: white; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 1000; display: none; flex-direction: column; overflow: hidden; min-width: 120px; }
+.context-menu.show { display: flex; }
+.context-item { padding: 12px 16px; font-size: 1rem; font-weight: bold; color: #333; cursor: pointer; text-align: center; border-bottom: 1px solid #eee; }
+.context-item:last-child { border-bottom: none; }
+.context-item:hover { background: #f0f8ff; color: var(--primary); }
+
+/* 可視化長條圖區 - 加入 min-height 確保高度固定 */
+.visual-stack { width: 100%; display: flex; flex-direction: column; gap: 30px; margin-bottom: 20px; min-height: 550px; }
+.visual-item { width: 100%; }
+
+.bar-label { font-weight: bold; margin-bottom: 8px; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; transition: color 0.3s; }
+.color-dot { width: 16px; height: 16px; border-radius: 50%; display: inline-block; transition: background 0.3s; }
+
+/* 直式分數顯示 */
+.disp-frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1.1; }
+.disp-num { padding: 0 4px; font-size: 1.1rem; }
+.disp-den { padding: 0 4px; border-top: 2px solid currentColor; font-size: 1.1rem; }
+.disp-mixed { display: inline-flex; align-items: center; gap: 4px; font-size: 1.3rem; }
+
+.bar-container { height: 60px; background: #eee; border-radius: 8px; position: relative; overflow: hidden; border: 2px solid var(--grid-dark); width: 100%; transition: width 0.3s ease, border-color 0.3s, box-shadow 0.3s; }
+.draggable-bar { cursor: ew-resize !important; touch-action: none; }
+.bar-fill { height: 100%; transition: width 0.4s ease, background 0.3s; position: absolute; z-index: 1; opacity: 0.7; pointer-events: none; left: 0; top: 0; }
+
+.grid-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; z-index: 2; pointer-events: none; }
+.segment { flex: 1; }
+.divider-thick { flex: 0 0 3px; background: var(--grid-dark); z-index: 3; }
+.divider-thin { flex: 0 0 1px; background: rgba(0,0,0,0.3); z-index: 3; }
+
+/* 數線樣式 (每條獨立) — 視覺樣式已移至 number-line.css；此處只留各 app 專屬行為 */
+.number-line-wrapper { padding: 0; margin-top: 5px; width: 100%; display: none; transition: width 0.3s ease; }
+
+#error_hint { transition: 0.3s; }
+
+@media (max-width: 600px) {
+    .container { padding: 1rem; }
+    .math-engine { gap: 10px; padding: 25px 10px 40px 10px; min-height: 170px; }
+    .visual-stack { min-height: 500px; }
+    .input-card { min-height: 100px; padding: 10px; }
+    .input-wrapper { width: 65px; height: 40px; }
+    .input-wrapper input { font-size: 1.3rem; }
+    .input-wrapper.wrapper-w { width: 70px; height: 50px; }
+    .input-wrapper.wrapper-w input { font-size: 1.6rem; }
+    .bar-container { height: 45px; }
+}

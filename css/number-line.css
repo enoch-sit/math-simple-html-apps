@@ -1,0 +1,82 @@
+/* number-line.css
+   Shared "tick axis" number-line look for the apps that draw a real number line
+   with an axis, tick marks and fraction labels (currently 分數比較 59, 相等分數 64).
+
+   This file standardizes only the VISUAL appearance of the tick axis.
+   Behavioural / layout rules that differ by app (e.g. .number-line-wrapper,
+   which controls default visibility and outer spacing) stay in each app's own
+   stylesheet and are loaded after this file so they can override.
+
+   Markup contract expected by these rules:
+     .number-line-container         positioning context for one axis
+       .nl-line                     the horizontal axis line
+       .nl-tick-wrapper             one per tick (absolutely positioned)
+         .nl-tick (.major)          the tick mark
+         .nl-label                  text/number under the tick
+           .nl-frac                 stacked fraction label
+             .nl-num / .nl-den      numerator / denominator
+             .nl-line-frac          fraction bar
+*/
+
+.number-line-container {
+    position: relative;
+    height: 50px;
+    width: 100%;
+}
+
+.nl-line {
+    position: absolute;
+    top: 5px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #000;
+}
+
+.nl-tick-wrapper {
+    position: absolute;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translateX(-50%);
+}
+
+.nl-tick {
+    width: 2px;
+    height: 12px;
+    background: #000;
+}
+
+.nl-tick.major {
+    height: 18px;
+    width: 3px;
+}
+
+.nl-label {
+    margin-top: 4px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #000;
+    text-align: center;
+}
+
+.nl-frac {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.1;
+    font-size: 0.85rem;
+}
+
+.nl-num,
+.nl-den {
+    padding: 0 2px;
+}
+
+.nl-line-frac {
+    width: 100%;
+    height: 1.5px;
+    background: #000;
+    margin: 1px 0;
+}

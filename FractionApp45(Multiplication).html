@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FractionApp45(Multiplication)</title>
+    
+<link rel="stylesheet" href="css/arith-common.css">
+<link rel="stylesheet" href="css/nav.css">
+<link rel="stylesheet" href="css/FractionApp45.css">
+<link rel="stylesheet" href="css/bar-component.css">
+</head>
+<body>
+
+<div id="tutorial-finger">👆</div>
+
+<div class="container">
+    <div class="header">
+        <div class="header-left">
+            <div class="title-badge">分數乘法教學</div>
+        </div>
+        <div class="header-right">
+            <div class="controls-pill">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="show-whole-cb" onchange="toggleWholeNumber()"> 顯示帶分數
+                </label>
+                <span class="divider"></span>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="show-nl-cb" onchange="toggleNumberLine()"> 顯示數線
+                </label>
+                <span class="divider"></span>
+                <div class="speed-ctrl">
+                    <label for="speed-slider" title="調整動畫速度">動畫速度: <span id="speed-val" style="color: var(--blue);">1.0</span>x</label>
+                    <input type="range" id="speed-slider" min="0.5" max="3" step="0.1" value="1.0" oninput="updateSpeed()">
+                </div>
+            </div>
+            <button class="lang-btn btn-random" onclick="randomChallenge()">🎲 隨機出題</button>
+        </div>
+    </div>
+
+    <div id="word-problem" class="word-problem"></div>
+
+    <div class="answer-zone">
+        <div class="formula">
+            <div class="mixed-frac" id="frac1-group" onclick="onFrac1Click()" title="點擊設定被乘數圖形">
+                <input type="number" class="whole-input" id="w1" placeholder=" " min="0" max="10" onchange="updateUI()">
+                <div class="frac">
+                    <input type="number" class="frac-input" id="n1" value="2" min="1" max="10" onchange="updateUI()">
+                    <div class="frac-line"></div>
+                    <input type="number" class="frac-input" id="d1" value="3" min="1" max="10" onchange="updateUI()">
+                </div>
+            </div>
+            <span style="cursor:pointer;" onclick="onFrac2Click()" title="點擊播放乘法動畫">×</span>
+            <div class="mixed-frac" id="frac2-group" onclick="onFrac2Click()" title="點擊播放乘法動畫">
+                <input type="number" class="whole-input" id="w2" placeholder=" " min="0" max="10" onchange="updateUI()">
+                <div class="frac">
+                    <input type="number" class="frac-input" id="n2" value="1" min="1" max="10" onchange="updateUI()">
+                    <div class="frac-line"></div>
+                    <input type="number" class="frac-input" id="d2" value="2" min="1" max="10" onchange="updateUI()">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="animation-zone" id="anim-zone">
+        <div id="drag-instruction" class="instruction-text">💡 準備中...請先點擊上方的「被乘數」</div>
+        <div id="anim-area">
+            <div id="bar1-row" style="display:none; position:relative; width:100%; min-height:80px; align-items:center; justify-content:space-between;">
+                <div id="label1" style="width:15%; text-align:center; font-size:1.3rem; transition: opacity 0.5s; opacity: 1; font-weight:bold;"></div>
+                <div class="bars-column">
+                    <div id="main-bar-wrap" class="bar-wrap-container" onclick="toggleRearrange()"></div>
+                    <div id="bar1-nl" class="nl-wrap-container" style="display:none;"></div>
+                </div>
+                <div style="width:15%;"></div>
+            </div>
+        </div>
+
+        <div id="bottom-answer-zone">
+            <div class="formula">
+                <div id="bot-frac1"></div>
+                <span>×</span>
+                <div id="bot-frac2"></div>
+                <span>=</span>
+                <div class="mixed-frac" style="cursor: default;">
+                    <input type="number" class="whole-input" id="ans-w" placeholder=" " min="0" oninput="autoCheck()">
+                    <div class="frac">
+                        <input type="number" class="frac-input" id="ans-num" placeholder="?" min="0" oninput="autoCheck()">
+                        <div class="frac-line" style="background: #ccc;"></div>
+                        <input type="number" class="frac-input" id="ans-den" placeholder="?" min="1" oninput="autoCheck()">
+                    </div>
+                </div>
+            </div>
+            <div id="feedback" class="feedback-msg"></div>
+        </div>
+    </div>
+</div>
+
+<script src="js/FractionApp45.js"></script>
+</body>
+</html>

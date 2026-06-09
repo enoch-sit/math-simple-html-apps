@@ -1,0 +1,177 @@
+﻿/* nav.css
+   Shared header/navigation bar style based on App64's design.
+   Used by all apps that adopt the unified nav look.
+
+   Markup contract:
+     .header
+       .header-left
+         .title-badge              app title text
+         (optional buttons)
+       .header-right
+         .controls-pill            grouped controls container
+           .checkbox-label         label wrapping a checkbox + text
+           .divider                vertical separator line
+           .speed-ctrl             speed slider group
+         .lang-btn                 action buttons (3D push style)
+         .lang-btn.btn-active-mode active state button
+*/
+
+:root {
+    --nav-gray: #95a5a6;
+    --nav-primary: #3498db;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.title-badge {
+    color: #0056b3;
+    font-weight: bold;
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.controls-pill {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 6px 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.95rem;
+    color: #333;
+    cursor: pointer;
+    user-select: none;
+    font-weight: bold;
+}
+
+.checkbox-label input[type="checkbox"] {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--nav-primary);
+}
+
+.divider {
+    width: 1px;
+    height: 18px;
+    background: #ccc;
+}
+
+.speed-ctrl {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    color: #333;
+    font-weight: bold;
+}
+
+.speed-ctrl input[type="range"] {
+    width: 80px;
+    cursor: pointer;
+    accent-color: var(--nav-primary);
+}
+
+.lang-btn {
+    padding: 6px 16px;
+    border: 2px solid var(--nav-gray);
+    background: white;
+    color: #333;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.95rem;
+    box-shadow: 0 3px 0 var(--nav-gray);
+    outline: none;
+    transition: 0.15s;
+    transform: translateY(0);
+}
+
+.lang-btn:active {
+    box-shadow: 0 0 0 var(--nav-gray);
+    transform: translateY(3px);
+}
+
+.lang-btn.btn-active-mode {
+    border-color: #34495e;
+    color: #34495e;
+    box-shadow: 0 3px 0 #34495e;
+}
+
+/* Random/action button uses lang-btn plus a purple accent */
+.lang-btn.btn-random {
+    border-color: #9b59b6;
+    color: #9b59b6;
+    box-shadow: 0 3px 0 #9b59b6;
+}
+
+.lang-btn.btn-random:hover {
+    background: #9b59b6;
+    color: white;
+}
+
+.lang-btn.btn-random:active {
+    box-shadow: 0 0 0 #9b59b6;
+    transform: translateY(3px);
+    background: #8e44ad;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+    .header-left {
+        justify-content: center;
+    }
+    .header-right {
+        justify-content: center;
+        width: 100%;
+    }
+    .controls-pill {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .title-badge {
+        font-size: 1.1rem;
+    }
+    .lang-btn {
+        padding: 6px 14px;
+        font-size: 0.85rem;
+    }
+}
+

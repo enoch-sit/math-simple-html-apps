@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FractionApp52(相等分數)</title>
+
+<link rel="stylesheet" href="css/nav.css">
+<link rel="stylesheet" href="css/number-line.css">
+<link rel="stylesheet" href="css/FractionApp64.css">
+<link rel="stylesheet" href="css/bar-component.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="header-left">
+            <button id="btn_toggle_sync" class="lang-btn btn-active-mode" onclick="toggleSyncMode()">模式1</button>
+            <div class="title-badge" id="title_text">相等分數</div>
+        </div>
+        <div class="header-right">
+            <button class="lang-btn" onclick="swapFractions()">左右互換</button>
+            <button class="lang-btn" onclick="generateRandomFraction()">隨機分數</button>
+            <div class="controls-pill">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="cb_toggle_nl" onchange="toggleNumberLine()"> 顯示數線
+                </label>
+                <div class="divider"></div>
+                <div class="speed-ctrl">
+                    <span id="speed_label">動畫速度: 1.0 x</span>
+                    <input type="range" id="speed_slider" min="0.5" max="3" step="0.1" value="1" oninput="updateSpeedUI(this.value)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="question-banner" id="question_banner">
+        <div class="q-label" id="q_label">在空格內填上正確的數字</div>
+        <div class="q-equation" id="q_equation"></div>
+    </div>
+
+    <div class="control-panel">
+        <button id="btn_merge" class="action-btn btn-merge" onclick="setMode('/')">約分</button>
+        <button id="btn_slice" class="action-btn btn-slice" onclick="setMode('*')">擴分</button>
+    </div>
+
+    <div class="math-engine" id="engine">
+        
+        <div class="fraction-box">
+            <div class="input-wrapper start-wrap">
+                <input type="number" id="n_start" class="num-input" value="2" min="1" max="100" inputmode="numeric" 
+                       onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="manualInputChange()" onblur="checkEmpty(this, 2)">
+                <div class="stepper-btn-group">
+                    <button class="step-btn up" onclick="stepInput('n_start', 1)">+</button>
+                    <button class="step-btn down" onclick="stepInput('n_start', -1)">-</button>
+                </div>
+            </div>
+            
+            <div class="fraction-line"></div>
+            
+            <div class="input-wrapper start-wrap">
+                <input type="number" id="d_start" class="den-input" value="8" min="1" max="100" inputmode="numeric" 
+                       onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="manualInputChange()" onblur="checkEmpty(this, 8)">
+                <div class="stepper-btn-group">
+                    <button class="step-btn up" onclick="stepInput('d_start', 1)">+</button>
+                    <button class="step-btn down" onclick="stepInput('d_start', -1)">-</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="eq-sign" id="eq_left">=</div>
+
+        <div class="process-container">
+            <div class="row-align">
+                <div id="ln" class="base-num num-input">2</div>
+                <div id="on" class="op-select">×</div>
+                <div class="input-wrapper factor-wrap" id="wrap_fn">
+                    <input type="number" id="fn" value="1" min="1" max="20" inputmode="numeric" 
+                           onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="manualFactorChange('fn', this.value)" onblur="checkEmpty(this, 1)">
+                    <div class="stepper-btn-group" id="group_fn">
+                        <button class="step-btn up" onclick="stepFactor('fn', 1)">+</button>
+                        <button class="step-btn down" onclick="stepFactor('fn', -1)">-</button>
+                    </div>
+                </div>
+            </div>
+            <div class="fraction-line" style="margin: 10px 0; background: #000; height: 3px;"></div>
+            <div class="row-align">
+                <div id="ld" class="base-num den-input">8</div>
+                <div id="od" class="op-select">×</div>
+                <div class="input-wrapper factor-wrap" id="wrap_fd">
+                    <input type="number" id="fd" value="1" min="1" max="20" inputmode="numeric" 
+                           onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="manualFactorChange('fd', this.value)" onblur="checkEmpty(this, 1)">
+                    <div class="stepper-btn-group" id="group_fd">
+                        <button class="step-btn up" onclick="stepFactor('fd', 1)">+</button>
+                        <button class="step-btn down" onclick="stepFactor('fd', -1)">-</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="eq-sign">=</div>
+
+        <div class="fraction-box" style="width: 80px;">
+            <input type="text" id="n_target" class="fraction-input num-target" readonly tabindex="-1">
+            <div class="fraction-line"></div>
+            <input type="text" id="d_target" class="fraction-input den-input" readonly tabindex="-1">
+        </div>
+    </div>
+    
+    <div id="error_msg"></div>
+
+    <div class="visual-stack">
+        <div>
+            <div class="bar-label" style="color:var(--accent); justify-content: space-between; display: flex; width: 100%;">
+                <span id="label_result">運算結果</span>
+            </div>
+            <div style="width: 100%; overflow-x: auto; overflow-y: hidden; padding-bottom: 15px; border-radius: 8px; -webkit-overflow-scrolling: touch;">
+                <div id="scale_wrapper" style="width: 100%; min-width: 100%; transition: width 0.3s ease;">
+                    <div class="bar-container" id="container_process" style="border-color: var(--accent); width: 100%;">
+                        <div id="bar_process" class="bar-fill" style="background: var(--accent); opacity: 0.8; pointer-events: none;"></div>
+                        <div id="grid_process" style="pointer-events: none;"></div>
+                    </div>
+                    
+                    <div id="number_line_wrapper" class="number-line-wrapper" style="display: none; width: 100%;">
+                        <div class="number-line-container">
+                            <div class="nl-line"></div>
+                            <div id="nl_ticks"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="js/FractionApp64.js"></script>
+</body>
+</html>

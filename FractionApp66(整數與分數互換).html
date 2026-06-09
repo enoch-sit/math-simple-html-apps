@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>整數與分數互換</title>
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/FractionApp66.css">
+    <link rel="stylesheet" href="css/bar-component.css">
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <div class="header-left">
+            <div class="title-badge">整數與分數互換</div>
+        </div>
+        <div class="header-right">
+            <div class="controls-pill">
+                <button class="lang-btn" id="btn-mode-mixed" onclick="setMode('mixed')" style="border-color:#34495e; color:#34495e; box-shadow:0 3px 0 #34495e;">帶分數</button>
+                <span class="divider"></span>
+                <button class="lang-btn" id="btn-mode-whole" onclick="setMode('whole')">整數</button>
+                <span class="divider"></span>
+                <button class="lang-btn" id="btn-mode-fraction" onclick="setMode('fraction')">分數</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="barsDisplay" class="bars-container"></div>
+
+    <div class="dashboard">
+        <div class="input-section">
+            <div class="info-title">請輸入數值</div>
+            <div class="fraction-ui" id="inputArea">
+                <input type="number" id="inputWhole" value="1" min="1" max="100">
+                <div class="fraction-input-stack" id="fractionPart" style="display:inline-flex; flex-direction: column; align-items: center;">
+                    <input type="number" id="inputNum" value="1" min="1" max="100">
+                    <div class="f-line"></div>
+                    <input type="number" id="inputDen" value="3" min="1" max="100">
+                </div>
+                <button class="btn-confirm" onclick="updateUI()">確定</button>
+            </div>
+
+            <div class="settings" style="margin-top: 20px;">
+                <div>
+                    <label>長條圖高度：</label>
+                    <input type="range" id="heightSlider" min="0" max="100" value="45" oninput="updateUI()">
+                </div>
+                <div style="margin-top: 10px;">
+                    <label>單位闊度：</label>
+                    <input type="range" id="widthSlider" min="50" max="300" value="150" oninput="updateUI()">
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section" id="explanationText"></div>
+    </div>
+</div>
+
+<div id="customContextMenu">
+    <div onclick="setMode('whole')">整數</div>
+    <div onclick="setMode('fraction')">分數</div>
+    <div onclick="setMode('mixed')">帶分數</div>
+</div>
+
+<script src="js/FractionApp66.js"></script>
+
+</body>
+</html>

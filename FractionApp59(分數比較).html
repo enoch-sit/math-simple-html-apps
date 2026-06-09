@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>分數比較</title>
+
+<link rel="stylesheet" href="css/nav.css">
+<link rel="stylesheet" href="css/number-line.css">
+<link rel="stylesheet" href="css/FractionApp59.css">
+<link rel="stylesheet" href="css/bar-component.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="header-left">
+            <div class="title-badge" id="title_text">分數比較</div>
+        </div>
+        <div class="header-right">
+            <select id="fraction_count" class="lang-btn" onchange="changeCount(this.value)">
+                <option value="2">比較 2 個分數</option>
+                <option value="3">比較 3 個分數</option>
+            </select>
+            <button id="btn_toggle_sync" class="lang-btn btn-active-mode" onclick="toggleSyncMode()">模式1</button>
+            <div id="length_controls" style="display:none; gap:10px;">
+                <button class="lang-btn" onclick="randomizeBars()" style="box-shadow: 0 2px 0 var(--gray); font-size:0.9rem; padding: 4px 10px;">隨機長度</button>
+                <button class="lang-btn" onclick="matchBars()" style="box-shadow: 0 2px 0 var(--gray); font-size:0.9rem; padding: 4px 10px;">設定同一長度</button>
+            </div>
+            <div class="controls-pill">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="cb_toggle_nl" onchange="toggleNumberLine()"> 顯示數線
+                </label>
+                <span class="divider"></span>
+                <button class="lang-btn" id="btn-fmt-mixed" onclick="setFormatGlobal('mixed')" style="border-color:#34495e; color:#34495e; box-shadow:0 3px 0 #34495e; padding:4px 10px; font-size:0.85rem;">帶分數</button>
+                <button class="lang-btn" id="btn-fmt-integer" onclick="setFormatGlobal('integer')" style="padding:4px 10px; font-size:0.85rem;">整數</button>
+                <button class="lang-btn" id="btn-fmt-fraction" onclick="setFormatGlobal('fraction')" style="padding:4px 10px; font-size:0.85rem;">分數</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="math-engine" id="inputs_container">
+    </div>
+
+    <div class="visual-stack" id="visuals_container">
+    </div>
+</div>
+
+<div id="context_menu" class="context-menu">
+    <div class="context-item" onclick="setFormat('integer')">整數</div>
+    <div class="context-item" onclick="setFormat('fraction')">分數</div>
+    <div class="context-item" onclick="setFormat('mixed')">帶分數</div>
+</div>
+
+<script src="js/FractionApp59.js"></script>
+</body>
+</html>

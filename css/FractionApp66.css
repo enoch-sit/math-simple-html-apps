@@ -1,0 +1,320 @@
+:root {
+    --primary-red: #ff3333;
+    --bar-border-color: #2c3e50;
+    --integer-green: #009900;
+    --bg-gray: #f9f9f9;
+    --dark: #2c3e50;
+}
+
+body {
+    font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
+    background-color: #f4f7f6;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.app-container {
+    width: 900px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 25px;
+}
+
+/* Header styled by nav.css */
+
+/* Bar display area */
+.bars-container {
+    margin-bottom: 30px;
+    min-height: 100px;
+    padding: 20px 30px;
+    background: #fafafa;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    overflow-x: auto;
+}
+
+/* Use the shared bar classes from bar-component.css / arith-common patterns */
+.bars-container .bar-wrap-container {
+    gap: 0 !important;
+    flex-wrap: nowrap !important;
+    display: flex;
+}
+
+.bars-container .bar-unit {
+    position: relative;
+    border: var(--bar-border-width, 2px) solid var(--bar-border-color);
+    border-radius: 0;
+    box-sizing: border-box;
+    background: var(--bar-bg, #f5f5f5);
+    overflow: hidden;
+    min-width: 0;
+    flex: 1;
+    width: auto !important;
+}
+
+.bars-container .bar-wrap-container.continuous .bar-unit:first-child {
+    border-top-left-radius: var(--bar-border-radius, 6px);
+    border-bottom-left-radius: var(--bar-border-radius, 6px);
+}
+
+.bars-container .bar-wrap-container.continuous .bar-unit:last-child {
+    border-top-right-radius: var(--bar-border-radius, 6px);
+    border-bottom-right-radius: var(--bar-border-radius, 6px);
+    border-right: var(--bar-border-width, 2px) solid var(--bar-border-color);
+}
+
+.bars-container .bar-wrap-container.continuous .bar-unit:not(:last-child) {
+    border-right: none;
+}
+
+.bars-container .bar-fill {
+    height: 100%;
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    opacity: var(--bar-fill-opacity, 0.8);
+    transition: width 0.3s ease;
+}
+
+.bars-container .grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.bars-container .abs-thin-line {
+    position: absolute;
+    top: 0;
+    width: var(--grid-thin-width, 1px);
+    height: 100%;
+    background: var(--grid-thin-color, rgba(44, 62, 80, 0.5));
+    transform: translateX(-50%);
+    z-index: 3;
+}
+
+/* Number line below bars */
+.bars-container .nl-wrap-container {
+    display: flex;
+    flex-wrap: nowrap !important;
+    margin-top: 2px;
+    gap: 0 !important;
+}
+
+.bars-container .nl-unit {
+    flex: 1;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.bars-container .nl-line {
+    height: var(--nl-axis-height, 2px);
+    background: var(--nl-axis-color, #2c3e50);
+}
+
+.bars-container .nl-tick-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translateX(-50%);
+}
+
+.bars-container .nl-tick {
+    width: var(--nl-tick-width, 2px);
+    height: var(--nl-tick-height, 12px);
+    background: var(--nl-tick-color, #2c3e50);
+}
+
+.bars-container .nl-label {
+    margin-top: 4px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #000;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.bars-container .nl-frac {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.1;
+    font-size: 0.85rem;
+}
+
+.bars-container .nl-num,
+.bars-container .nl-den {
+    padding: 0 2px;
+    font-weight: bold;
+}
+
+.bars-container .nl-line-frac {
+    width: 100%;
+    height: var(--frac-line-height, 1.5px);
+    background: var(--frac-line-color, #2c3e50);
+    margin: 1px 0;
+}
+
+/* Dashboard layout */
+.dashboard {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 20px;
+    border-top: 2px solid #eee;
+    padding-top: 20px;
+}
+
+.input-section {
+    background: var(--bg-gray);
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    position: relative;
+}
+
+.fraction-ui {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 15px 0;
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+input[type="number"] {
+    width: 55px;
+    padding: 5px;
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+}
+
+#inputWhole {
+    border-color: var(--integer-green); 
+    background-color: white; 
+}
+
+#inputNum {
+    color: var(--primary-red);
+    border-color: #ff9999;
+}
+
+#inputDen {
+    color: var(--bar-border-color);
+    border-color: #9999ff;
+}
+
+.f-line {
+    width: 100%;
+    height: 2px;
+    background: black;
+    margin: 4px 0;
+}
+
+.btn-confirm {
+    padding: 6px 15px;
+    font-size: 1em;
+    font-weight: bold;
+    background-color: #0056b3;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-confirm:hover {
+    background-color: #003d80;
+}
+
+
+.info-section {
+    padding: 15px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    border-radius: 12px;
+}
+
+.info-title {
+    color: var(--dark);
+    font-weight: bold;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #edf2f7;
+    padding-bottom: 8px;
+}
+
+/* Fraction display in info panel */
+.info-section .nl-frac {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.1;
+    vertical-align: middle;
+}
+
+.info-section .nl-num,
+.info-section .nl-den {
+    padding: 0 3px;
+    font-weight: bold;
+}
+
+.info-section .nl-line-frac {
+    width: 100%;
+    height: 2px;
+    background: var(--frac-line-color, #2c3e50);
+    margin: 2px 0;
+}
+
+#customContextMenu {
+    display: none;
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
+    z-index: 1000;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#customContextMenu div {
+    padding: 10px 20px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#customContextMenu div:hover {
+    background-color: #f0f8ff;
+    color: #0056b3;
+}
+
+/* Settings sliders */
+.settings label {
+    font-weight: bold;
+    color: var(--dark);
+    font-size: 0.95rem;
+}
+
+.settings input[type="range"] {
+    cursor: pointer;
+    accent-color: #0056b3;
+}
+
+@media (max-width: 768px) {
+    .app-container {
+        width: 100%;
+        padding: 15px;
+    }
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+}
