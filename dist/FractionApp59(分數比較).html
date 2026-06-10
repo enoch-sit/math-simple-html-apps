@@ -1,3 +1,588 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>分數比較</title>
+
+<style>
+/* nav.css */
+﻿/* nav.css
+   Shared header/navigation bar style based on App64's design.
+   Used by all apps that adopt the unified nav look.
+
+   Markup contract:
+     .header
+       .header-left
+         .title-badge              app title text
+         (optional buttons)
+       .header-right
+         .controls-pill            grouped controls container
+           .checkbox-label         label wrapping a checkbox + text
+           .divider                vertical separator line
+           .speed-ctrl             speed slider group
+         .lang-btn                 action buttons (3D push style)
+         .lang-btn.btn-active-mode active state button
+*/
+
+:root {
+    --nav-gray: #95a5a6;
+    --nav-primary: #3498db;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.title-badge {
+    color: #0056b3;
+    font-weight: bold;
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.controls-pill {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 6px 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.95rem;
+    color: #333;
+    cursor: pointer;
+    user-select: none;
+    font-weight: bold;
+}
+
+.checkbox-label input[type="checkbox"] {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--nav-primary);
+}
+
+.divider {
+    width: 1px;
+    height: 18px;
+    background: #ccc;
+}
+
+.speed-ctrl {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    color: #333;
+    font-weight: bold;
+}
+
+.speed-ctrl input[type="range"] {
+    width: 80px;
+    cursor: pointer;
+    accent-color: var(--nav-primary);
+}
+
+.lang-btn {
+    padding: 6px 16px;
+    border: 2px solid var(--nav-gray);
+    background: white;
+    color: #333;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.95rem;
+    box-shadow: 0 3px 0 var(--nav-gray);
+    outline: none;
+    transition: 0.15s;
+    transform: translateY(0);
+}
+
+.lang-btn:active {
+    box-shadow: 0 0 0 var(--nav-gray);
+    transform: translateY(3px);
+}
+
+.lang-btn.btn-active-mode {
+    border-color: #34495e;
+    color: #34495e;
+    box-shadow: 0 3px 0 #34495e;
+}
+
+/* Random/action button uses lang-btn plus a purple accent */
+.lang-btn.btn-random {
+    border-color: #9b59b6;
+    color: #9b59b6;
+    box-shadow: 0 3px 0 #9b59b6;
+}
+
+.lang-btn.btn-random:hover {
+    background: #9b59b6;
+    color: white;
+}
+
+.lang-btn.btn-random:active {
+    box-shadow: 0 0 0 #9b59b6;
+    transform: translateY(3px);
+    background: #8e44ad;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+    .header-left {
+        justify-content: center;
+    }
+    .header-right {
+        justify-content: center;
+        width: 100%;
+    }
+    .controls-pill {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .title-badge {
+        font-size: 1.1rem;
+    }
+    .lang-btn {
+        padding: 6px 14px;
+        font-size: 0.85rem;
+    }
+}
+
+
+</style>
+<style>
+/* number-line.css */
+/* number-line.css
+   Shared "tick axis" number-line look for the apps that draw a real number line
+   with an axis, tick marks and fraction labels (currently 分數比較 59, 相等分數 64).
+
+   This file standardizes only the VISUAL appearance of the tick axis.
+   Behavioural / layout rules that differ by app (e.g. .number-line-wrapper,
+   which controls default visibility and outer spacing) stay in each app's own
+   stylesheet and are loaded after this file so they can override.
+
+   Markup contract expected by these rules:
+     .number-line-container         positioning context for one axis
+       .nl-line                     the horizontal axis line
+       .nl-tick-wrapper             one per tick (absolutely positioned)
+         .nl-tick (.major)          the tick mark
+         .nl-label                  text/number under the tick
+           .nl-frac                 stacked fraction label
+             .nl-num / .nl-den      numerator / denominator
+             .nl-line-frac          fraction bar
+*/
+
+.number-line-container {
+    position: relative;
+    height: 50px;
+    width: 100%;
+}
+
+.nl-line {
+    position: absolute;
+    top: 5px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #000;
+}
+
+.nl-tick-wrapper {
+    position: absolute;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translateX(-50%);
+}
+
+.nl-tick {
+    width: 2px;
+    height: 12px;
+    background: #000;
+}
+
+.nl-tick.major {
+    height: 18px;
+    width: 3px;
+}
+
+.nl-label {
+    margin-top: 4px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #000;
+    text-align: center;
+}
+
+.nl-frac {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.1;
+    font-size: 0.85rem;
+}
+
+.nl-num,
+.nl-den {
+    padding: 0 2px;
+}
+
+.nl-line-frac {
+    width: 100%;
+    height: 1.5px;
+    background: #000;
+    margin: 1px 0;
+}
+
+</style>
+<style>
+/* FractionApp59.css */
+:root { 
+    --primary: #3498db; 
+    --accent: #8e44ad; 
+    --success: #27ae60; 
+    --red: #e74c3c; 
+    --gray: #95a5a6; 
+    --grid-dark: #333; 
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'PingFang HK', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif; background: linear-gradient(135deg, #e0f7fa 0%, #fff9c4 100%); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+.container { background: white; padding: 1.5rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); max-width: 900px; width: 100%; }
+
+/* Nav bar styles now in nav.css */
+select.lang-btn { appearance: none; padding-right: 30px; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 10px center; }
+
+/* 數值輸入區 (中間) - 加入 min-height 確保高度固定 */
+.math-engine { position: relative; display: flex; align-items: center; justify-content: center; gap: 20px; margin: 15px 0 30px 0; padding: 30px 15px 45px 15px; border-radius: 20px; background: #fdfdfd; border: 2px solid #eee; flex-wrap: wrap; min-height: 200px; }
+
+.input-card { position: relative; display: flex; align-items: center; justify-content: center; background: #fff; padding: 15px 25px; border-radius: 12px; border: 3px solid #ccc; box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: context-menu; touch-action: none; user-select: none; transition: 0.2s; min-height: 120px; }
+.input-card:hover { border-color: #bbb; }
+
+.fraction-group { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.mixed-group { display: flex; align-items: center; gap: 10px; }
+.fraction-line { width: 100%; height: 4px; background: var(--grid-dark); border-radius: 2px; }
+
+/* 封裝好的加減輸入元件 */
+.input-wrapper { display: flex; align-items: center; border-radius: 8px; background: white; overflow: hidden; height: 45px; border: 2px solid #ccc; box-sizing: border-box; width: 75px; }
+.input-wrapper.wrapper-w { width: 85px; height: 60px; }
+.input-wrapper input { flex: 1; width: 100%; height: 100%; border: none; outline: none; text-align: center; font-size: 1.5rem; font-weight: bold; background: transparent; -moz-appearance: textfield; color: #333; padding: 0; }
+.input-wrapper.wrapper-w input { font-size: 2rem; }
+.input-wrapper input::-webkit-inner-spin-button, .input-wrapper input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+.stepper-btn-group { display: flex; flex-direction: column; height: 100%; width: 26px; border-left: 2px solid #eee; flex-shrink: 0; }
+.step-btn { height: 50%; width: 100%; border: none; background: #f8f9fa; color: #666; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; user-select: none; }
+.step-btn:active { background: #e2e6ea; }
+.step-btn.up { border-bottom: 2px solid #eee; }
+
+/* 右鍵/長按選單 */
+.context-menu { position: absolute; background: white; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 1000; display: none; flex-direction: column; overflow: hidden; min-width: 120px; }
+.context-menu.show { display: flex; }
+.context-item { padding: 12px 16px; font-size: 1rem; font-weight: bold; color: #333; cursor: pointer; text-align: center; border-bottom: 1px solid #eee; }
+.context-item:last-child { border-bottom: none; }
+.context-item:hover { background: #f0f8ff; color: var(--primary); }
+
+/* 可視化長條圖區 - 加入 min-height 確保高度固定 */
+.visual-stack { width: 100%; display: flex; flex-direction: column; gap: 30px; margin-bottom: 20px; min-height: 550px; }
+.visual-item { width: 100%; }
+
+.bar-label { font-weight: bold; margin-bottom: 8px; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; transition: color 0.3s; }
+.color-dot { width: 16px; height: 16px; border-radius: 50%; display: inline-block; transition: background 0.3s; }
+
+/* 直式分數顯示 */
+.disp-frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1.1; }
+.disp-num { padding: 0 4px; font-size: 1.1rem; }
+.disp-den { padding: 0 4px; border-top: 2px solid currentColor; font-size: 1.1rem; }
+.disp-mixed { display: inline-flex; align-items: center; gap: 4px; font-size: 1.3rem; }
+
+.bar-container { height: 60px; background: #eee; border-radius: 8px; position: relative; overflow: hidden; border: 2px solid var(--grid-dark); width: 100%; transition: width 0.3s ease, border-color 0.3s, box-shadow 0.3s; }
+.draggable-bar { cursor: ew-resize !important; touch-action: none; }
+.bar-fill { height: 100%; transition: width 0.4s ease, background 0.3s; position: absolute; z-index: 1; opacity: 0.7; pointer-events: none; left: 0; top: 0; }
+
+.grid-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; z-index: 2; pointer-events: none; }
+.segment { flex: 1; }
+.divider-thick { flex: 0 0 3px; background: var(--grid-dark); z-index: 3; }
+.divider-thin { flex: 0 0 1px; background: rgba(0,0,0,0.3); z-index: 3; }
+
+/* 數線樣式 (每條獨立) — 視覺樣式已移至 number-line.css；此處只留各 app 專屬行為 */
+.number-line-wrapper { padding: 0; margin-top: 5px; width: 100%; display: none; transition: width 0.3s ease; }
+
+#error_hint { transition: 0.3s; }
+
+@media (max-width: 600px) {
+    .container { padding: 1rem; }
+    .math-engine { gap: 10px; padding: 25px 10px 40px 10px; min-height: 170px; }
+    .visual-stack { min-height: 500px; }
+    .input-card { min-height: 100px; padding: 10px; }
+    .input-wrapper { width: 65px; height: 40px; }
+    .input-wrapper input { font-size: 1.3rem; }
+    .input-wrapper.wrapper-w { width: 70px; height: 50px; }
+    .input-wrapper.wrapper-w input { font-size: 1.6rem; }
+    .bar-container { height: 45px; }
+}
+
+</style>
+<style>
+/* bar-component.css */
+/* bar-component.css
+   Shared design tokens and typography for ALL bar/number-line visualizations.
+   
+   This file provides visual consistency across apps that use different DOM
+   structures for their bar + number line components. It defines:
+   
+   1. Design tokens (CSS custom properties) for bar appearance
+   2. Shared fraction-label typography (.stacked-fraction, .nl-frac, .disp-frac)
+   3. Shared number-line label styles
+   
+   Each app still keeps its own structural CSS (layout, positioning, sizing).
+   This file only overrides look & feel values to create a unified visual language.
+   
+   Load order: this file should come AFTER app-specific structure CSS so that
+   app structural rules are preserved, and token overrides take effect.
+   
+   Apps covered:
+   - 38/45/47/48 (arithmetic): .bar-unit, .bar-fill, .abs-thick-line, .nl-wrap-container
+   - 59 (分數比較): .bar-container, .bar-fill, .divider-thick/.divider-thin, .number-line-*
+   - 64 (相等分數): same as 59 + .anim-line
+   - 66 (整數與分數互換): now uses .bar-unit, .bar-fill, .abs-thin-line (same as arithmetic)
+*/
+
+/* ===== DESIGN TOKENS ===== */
+:root {
+    /* Bar frame */
+    --bar-border-color: #2c3e50;
+    --bar-border-width: 2px;
+    --bar-border-radius: 6px;
+    --bar-bg: #f5f5f5;
+    
+    /* Bar fill */
+    --bar-fill-opacity: 0.8;
+    --bar-fill-transition: width 0.4s ease;
+    
+    /* Grid lines */
+    --grid-thick-width: 3px;
+    --grid-thick-color: #2c3e50;
+    --grid-thin-width: 1px;
+    --grid-thin-color: rgba(44, 62, 80, 0.5);
+    
+    /* Number line */
+    --nl-axis-color: #2c3e50;
+    --nl-axis-height: 2px;
+    --nl-tick-color: #2c3e50;
+    --nl-tick-width: 2px;
+    --nl-tick-height: 12px;
+    --nl-tick-major-height: 18px;
+    --nl-tick-major-width: 3px;
+    
+    /* Fraction labels (used across all number lines and bar labels) */
+    --frac-label-size: 0.85rem;
+    --frac-label-color: #000;
+    --frac-label-weight: bold;
+    --frac-line-height: 1.5px;
+    --frac-line-color: #2c3e50;
+}
+
+
+/* ===== ARITHMETIC APPS (38/45/47/48) — token application ===== */
+
+.bar-unit {
+    border-width: var(--bar-border-width);
+    border-color: var(--bar-border-color);
+    border-radius: var(--bar-border-radius);
+    background: var(--bar-bg);
+}
+
+.bar-wrap-container .bar-fill {
+    opacity: var(--bar-fill-opacity);
+    transition: var(--bar-fill-transition);
+}
+
+.abs-thick-line {
+    width: var(--grid-thick-width);
+    background: var(--grid-thick-color);
+}
+
+.abs-thin-line {
+    width: var(--grid-thin-width);
+    background: var(--grid-thin-color);
+}
+
+.bar-wrap-container.continuous .bar-unit:last-child {
+    border-right-width: var(--bar-border-width);
+    border-right-color: var(--bar-border-color);
+}
+
+
+/* ===== APPS 59/64 — token application ===== */
+
+.bar-container {
+    border-width: var(--bar-border-width);
+    border-color: var(--bar-border-color);
+    border-radius: var(--bar-border-radius);
+    background: var(--bar-bg);
+}
+
+.bar-container .bar-fill {
+    opacity: var(--bar-fill-opacity);
+    transition: var(--bar-fill-transition);
+}
+
+.divider-thick {
+    flex-basis: var(--grid-thick-width);
+    background: var(--grid-thick-color);
+}
+
+.divider-thin {
+    flex-basis: var(--grid-thin-width);
+    background: var(--grid-thin-color);
+}
+
+
+/* ===== APP 66 — now uses same bar-unit structure as arithmetic apps ===== */
+
+
+/* ===== SHARED NUMBER LINE TOKENS ===== */
+
+/* Tick-axis number lines (apps 59, 64) — reinforces number-line.css with tokens */
+.nl-line {
+    background: var(--nl-axis-color);
+    height: var(--nl-axis-height);
+}
+
+.nl-tick {
+    width: var(--nl-tick-width);
+    height: var(--nl-tick-height);
+    background: var(--nl-tick-color);
+}
+
+.nl-tick.major {
+    height: var(--nl-tick-major-height);
+    width: var(--nl-tick-major-width);
+}
+
+
+/* ===== SHARED FRACTION LABEL TYPOGRAPHY ===== */
+/* 
+   Multiple apps render stacked fractions with different class names:
+   - Arithmetic apps (in-bar labels): .inline-frac span, .inline-frac .line
+   - Apps 59/64 (number line labels): .nl-frac, .nl-num, .nl-den, .nl-line-frac
+   - App 59 (bar labels): .disp-frac, .disp-num, .disp-den
+   - App 66 (bar labels): .stacked-fraction, .stacked-fraction .num/.den
+   
+   We standardize the visual appearance with consistent font, weight, line-bar:
+*/
+
+.nl-frac,
+.disp-frac,
+.stacked-fraction {
+    font-size: var(--frac-label-size);
+    font-weight: var(--frac-label-weight);
+    line-height: 1.1;
+}
+
+.nl-line-frac,
+.stacked-fraction .num {
+    border-bottom-color: var(--frac-line-color);
+}
+
+.nl-label {
+    color: var(--frac-label-color);
+    font-weight: var(--frac-label-weight);
+}
+
+/* Consistent fraction divider line appearance */
+.nl-line-frac {
+    height: var(--frac-line-height);
+    background: var(--frac-line-color);
+}
+
+.stacked-fraction .num {
+    border-bottom-width: var(--frac-line-height);
+    border-bottom-style: solid;
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="header-left">
+            <div class="title-badge" id="title_text">分數比較</div>
+        </div>
+        <div class="header-right">
+            <select id="fraction_count" class="lang-btn" onchange="changeCount(this.value)">
+                <option value="2">比較 2 個分數</option>
+                <option value="3">比較 3 個分數</option>
+            </select>
+            <button id="btn_toggle_sync" class="lang-btn btn-active-mode" onclick="toggleSyncMode()">模式1</button>
+            <div id="length_controls" style="display:none; gap:10px;">
+                <button class="lang-btn" onclick="randomizeBars()" style="box-shadow: 0 2px 0 var(--gray); font-size:0.9rem; padding: 4px 10px;">隨機長度</button>
+                <button class="lang-btn" onclick="matchBars()" style="box-shadow: 0 2px 0 var(--gray); font-size:0.9rem; padding: 4px 10px;">設定同一長度</button>
+            </div>
+            <div class="controls-pill">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="cb_toggle_nl" onchange="toggleNumberLine()"> 顯示數線
+                </label>
+                <span class="divider"></span>
+                <button class="lang-btn" id="btn-fmt-mixed" onclick="setFormatGlobal('mixed')" style="border-color:#34495e; color:#34495e; box-shadow:0 3px 0 #34495e; padding:4px 10px; font-size:0.85rem;">帶分數</button>
+                <button class="lang-btn" id="btn-fmt-integer" onclick="setFormatGlobal('integer')" style="padding:4px 10px; font-size:0.85rem;">整數</button>
+                <button class="lang-btn" id="btn-fmt-fraction" onclick="setFormatGlobal('fraction')" style="padding:4px 10px; font-size:0.85rem;">分數</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="math-engine" id="inputs_container">
+    </div>
+
+    <div class="visual-stack" id="visuals_container">
+    </div>
+</div>
+
+<div id="context_menu" class="context-menu">
+    <div class="context-item" onclick="setFormat('integer')">整數</div>
+    <div class="context-item" onclick="setFormat('fraction')">分數</div>
+    <div class="context-item" onclick="setFormat('mixed')">帶分數</div>
+</div>
+
+<script>
+// FractionApp59.js
 // 停用預設右鍵選單，改為觸發自訂選單
 document.addEventListener('contextmenu', event => {
     if (!event.target.closest('.input-card')) {
@@ -104,12 +689,11 @@ function toggleNumberLine() {
     wrappers.forEach(w => w.style.display = showNL ? 'block' : 'none');
 }
 
-// 手動輸入與防呆 (w 欄位最小0，其他欄位最小1，最大99)
+// 手動輸入與防呆 (修改：限制最小1，最大99)
 function handleInput(index, field, value) {
     let val = parseInt(value);
-    let minVal = (field === 'w') ? 0 : 1;
-    if (isNaN(val)) val = minVal;
-    if (val < minVal) val = minVal;
+    if (isNaN(val)) val = 1;
+    if (val < 1) val = 1;
     if (val > 99) val = 99;
 
     state[index][field] = val;
@@ -117,15 +701,14 @@ function handleInput(index, field, value) {
     updateVisuals();
 }
 
-// 按鈕加減控制 (w 欄位最小0，其他欄位最小1，最大99)
+// 按鈕加減控制 (修改：限制最小1，最大99)
 function stepVal(index, field, delta) {
     let el = document.getElementById(`input_${index}_${field}`);
     let val = parseInt(el.value);
-    let minVal = (field === 'w') ? 0 : 1;
-    if (isNaN(val)) val = minVal;
+    if (isNaN(val)) val = 1;
     val += delta;
     
-    if (val < minVal) val = minVal;
+    if (val < 1) val = 1;
     if (val > 99) val = 99;
     
     el.value = val;
@@ -140,7 +723,7 @@ function renderInputs() {
 
     const makeWrapper = (i, field, val, max, min=0, extraClass='') => `
         <div class="input-wrapper ${extraClass}">
-            <input type="number" id="input_${i}_${field}" value="${val}" min="${field === 'w' ? 0 : 1}" max="99"
+            <input type="number" id="input_${i}_${field}" value="${val}" min="1" max="99"
                    oninput="handleInput(${i}, '${field}', this.value)">
             <div class="stepper-btn-group">
                 <button class="step-btn up" onclick="stepVal(${i}, '${field}', 1)">+</button>
@@ -611,3 +1194,7 @@ function updateDragStyles() {
 
 // 初始化啟動
 window.onload = init;
+
+</script>
+</body>
+</html>

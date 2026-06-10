@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FractionApp52(相等分數)</title>
+
+<style>
+/* nav.css */
+﻿/* nav.css
+   Shared header/navigation bar style based on App64's design.
+   Used by all apps that adopt the unified nav look.
+
+   Markup contract:
+     .header
+       .header-left
+         .title-badge              app title text
+         (optional buttons)
+       .header-right
+         .controls-pill            grouped controls container
+           .checkbox-label         label wrapping a checkbox + text
+           .divider                vertical separator line
+           .speed-ctrl             speed slider group
+         .lang-btn                 action buttons (3D push style)
+         .lang-btn.btn-active-mode active state button
+*/
+
+:root {
+    --nav-gray: #95a5a6;
+    --nav-primary: #3498db;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.title-badge {
+    color: #0056b3;
+    font-weight: bold;
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.controls-pill {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 6px 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.95rem;
+    color: #333;
+    cursor: pointer;
+    user-select: none;
+    font-weight: bold;
+}
+
+.checkbox-label input[type="checkbox"] {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--nav-primary);
+}
+
+.divider {
+    width: 1px;
+    height: 18px;
+    background: #ccc;
+}
+
+.speed-ctrl {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    color: #333;
+    font-weight: bold;
+}
+
+.speed-ctrl input[type="range"] {
+    width: 80px;
+    cursor: pointer;
+    accent-color: var(--nav-primary);
+}
+
+.lang-btn {
+    padding: 6px 16px;
+    border: 2px solid var(--nav-gray);
+    background: white;
+    color: #333;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.95rem;
+    box-shadow: 0 3px 0 var(--nav-gray);
+    outline: none;
+    transition: 0.15s;
+    transform: translateY(0);
+}
+
+.lang-btn:active {
+    box-shadow: 0 0 0 var(--nav-gray);
+    transform: translateY(3px);
+}
+
+.lang-btn.btn-active-mode {
+    border-color: #34495e;
+    color: #34495e;
+    box-shadow: 0 3px 0 #34495e;
+}
+
+/* Random/action button uses lang-btn plus a purple accent */
+.lang-btn.btn-random {
+    border-color: #9b59b6;
+    color: #9b59b6;
+    box-shadow: 0 3px 0 #9b59b6;
+}
+
+.lang-btn.btn-random:hover {
+    background: #9b59b6;
+    color: white;
+}
+
+.lang-btn.btn-random:active {
+    box-shadow: 0 0 0 #9b59b6;
+    transform: translateY(3px);
+    background: #8e44ad;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+    .header-left {
+        justify-content: center;
+    }
+    .header-right {
+        justify-content: center;
+        width: 100%;
+    }
+    .controls-pill {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .title-badge {
+        font-size: 1.1rem;
+    }
+    .lang-btn {
+        padding: 6px 14px;
+        font-size: 0.85rem;
+    }
+}
+
+
+</style>
+<style>
+/* number-line.css */
+/* number-line.css
+   Shared "tick axis" number-line look for the apps that draw a real number line
+   with an axis, tick marks and fraction labels (currently 分數比較 59, 相等分數 64).
+
+   This file standardizes only the VISUAL appearance of the tick axis.
+   Behavioural / layout rules that differ by app (e.g. .number-line-wrapper,
+   which controls default visibility and outer spacing) stay in each app's own
+   stylesheet and are loaded after this file so they can override.
+
+   Markup contract expected by these rules:
+     .number-line-container         positioning context for one axis
+       .nl-line                     the horizontal axis line
+       .nl-tick-wrapper             one per tick (absolutely positioned)
+         .nl-tick (.major)          the tick mark
+         .nl-label                  text/number under the tick
+           .nl-frac                 stacked fraction label
+             .nl-num / .nl-den      numerator / denominator
+             .nl-line-frac          fraction bar
+*/
+
+.number-line-container {
+    position: relative;
+    height: 50px;
+    width: 100%;
+}
+
+.nl-line {
+    position: absolute;
+    top: 5px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #000;
+}
+
+.nl-tick-wrapper {
+    position: absolute;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translateX(-50%);
+}
+
+.nl-tick {
+    width: 2px;
+    height: 12px;
+    background: #000;
+}
+
+.nl-tick.major {
+    height: 18px;
+    width: 3px;
+}
+
+.nl-label {
+    margin-top: 4px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #000;
+    text-align: center;
+}
+
+.nl-frac {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.1;
+    font-size: 0.85rem;
+}
+
+.nl-num,
+.nl-den {
+    padding: 0 2px;
+}
+
+.nl-line-frac {
+    width: 100%;
+    height: 1.5px;
+    background: #000;
+    margin: 1px 0;
+}
+
+</style>
+<style>
+/* FractionApp64.css */
+:root { --primary: #3498db; --accent: #8e44ad; --success: #27ae60; --red: #e74c3c; --gray: #95a5a6; --grid-dark: #333; --yellow: #eeb015; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'PingFang HK', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif; background: linear-gradient(135deg, #e0f7fa 0%, #fff9c4 100%); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+.container { background: white; padding: 1.5rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); max-width: 850px; width: 100%; }
+
+/* Nav bar styles now in nav.css */
+#speed_slider { width: 80px; cursor: pointer; accent-color: var(--primary); }
+
+.control-panel { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; position: relative; z-index: 10; }
+.action-btn { width: 140px; padding: 12px; border-radius: 12px; border: 2px solid transparent; cursor: pointer; font-size: 1.2rem; font-weight: bold; transition: 0.15s ease-out; background: white; transform: translateY(0); }
+.btn-merge { border-color: var(--success); color: var(--success); box-shadow: 0 6px 0 var(--success); }
+.btn-merge:disabled { background: var(--success); color: white; box-shadow: 0 0 0 var(--success); transform: translateY(6px); opacity: 1; cursor: default; }
+.btn-slice { border-color: var(--yellow); color: var(--yellow); box-shadow: 0 6px 0 var(--yellow); }
+.btn-slice:disabled { background: var(--yellow); color: white; box-shadow: 0 0 0 var(--yellow); transform: translateY(6px); opacity: 1; cursor: default; }
+
+.math-engine { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 15px 0; padding: 25px 15px 15px 15px; border-radius: 20px; background: #fdfdfd; border: 2px solid #eee; flex-wrap: wrap; }
+.fraction-box { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+
+.fraction-input[readonly] { border: transparent; background: transparent; font-size: 2rem; pointer-events: none; width: 100%; text-align: center; font-weight: bold; padding: 8px 5px; }
+
+.num-target { color: var(--accent); } 
+.fraction-line { width: 100%; height: 5px; background: var(--grid-dark); margin: 8px 0; border-radius: 3px; }
+.eq-sign { font-size: 2.5rem; font-weight: bold; color: #000; flex-shrink: 0; margin: 0 5px; }
+
+.process-container { border: 3px dashed #000; padding: 15px; border-radius: 20px; background: #fffcf0; display: flex; flex-direction: column; align-items: center; flex-grow: 1; min-width: 250px; box-sizing: border-box; }
+.row-align { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin: 5px 0; }
+.base-num { font-size: 2rem; font-weight: bold; text-align: center; width: 40px; flex-shrink: 0; }
+
+.op-select { display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 900; border: 3px solid #000; color: #000; border-radius: 8px; width: 65px; height: 50px; background: white; box-sizing: border-box; user-select: none; }
+
+/* --- 整合在框內的輸入元件樣式 --- */
+.input-wrapper { display: flex; align-items: center; border-radius: 12px; background: white; overflow: hidden; height: 50px; border: 3px solid #000; box-sizing: border-box; transition: 0.3s; }
+.input-wrapper.start-wrap { border-color: #34495e; width: 100px; }
+.input-wrapper.factor-wrap { width: 95px; }
+
+.input-wrapper input { flex: 1; width: 100%; height: 100%; border: none; outline: none; text-align: center; font-size: 1.8rem; font-weight: bold; background: transparent; -moz-appearance: textfield; color: #000; }
+.input-wrapper input.num-input { color: var(--primary); }
+.input-wrapper input.den-input { color: var(--grid-dark); }
+.input-wrapper input::-webkit-inner-spin-button, .input-wrapper input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+.stepper-btn-group { display: flex; flex-direction: column; height: 100%; width: 35px; border-left: 2px solid #000; flex-shrink: 0; transition: 0.3s; }
+.step-btn { height: 50%; flex: none; width: 100%; border: none; background: #f8f9fa; color: #000; font-size: 1.2rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; line-height: 1; transition: 0.2s; user-select: none; box-sizing: border-box; }
+.step-btn:active { background: #e2e6ea; }
+.step-btn.up { border-bottom: 2px solid #000; }
+/* ------------------------------- */
+
+#error_msg { color: var(--red); font-size: 0.9rem; text-align: center; min-height: 2.4rem; margin-top: -10px; margin-bottom: 10px; font-weight: bold; width: 100%; white-space: pre-line; }
+
+.visual-stack { width: 100%; display: flex; flex-direction: column; gap: 20px; margin-bottom: 20px; }
+.bar-label { font-weight: bold; margin-bottom: 5px; font-size: 1.1rem; display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+/* 移除 overflow: hidden 讓長度可以動態調整 */
+.bar-container { height: 70px; background: #eee; border-radius: 12px; position: relative; border: 2px solid var(--grid-dark); transition: width 0.3s ease, border-color 0.3s, box-shadow 0.3s, filter 0.3s; }
+
+.bar-fill { height: 100%; transition: width 0.4s ease; position: absolute; z-index: 1; opacity: 0.8; pointer-events: none; border-radius: 10px; }
+
+.grid-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; z-index: 2; pointer-events: none; border-radius: 10px; overflow: hidden; }
+.segment { flex: 1; }
+.divider-thick { flex: 0 0 3px; background: var(--grid-dark); z-index: 3; }
+.divider-thin { flex: 0 0 1px; position: relative; z-index: 3; }
+.divider-thin .anim-line { position: absolute; top: 0; left: 0; width: 100%; transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s; }
+
+/* 數線樣式 — 視覺樣式已移至 number-line.css；此處只留各 app 專屬行為 */
+.number-line-wrapper { padding: 0 2px; margin-top: 5px; transition: width 0.3s ease, opacity 0.3s ease; }
+
+.question-banner { display: none; background: #e3f2fd; border-radius: 14px; padding: 14px 20px; margin-bottom: 20px; text-align: center; border: 2px solid #bbdefb; }
+.question-banner.show { display: block; }
+.question-banner .q-label { font-size: 0.85rem; color: #666; margin-bottom: 6px; }
+.question-banner .q-equation { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1.6rem; font-weight: bold; color: #1565c0; }
+.question-banner .q-frac { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.1; }
+.question-banner .q-frac .q-num { padding: 2px 8px; }
+.question-banner .q-frac .q-line { width: 100%; height: 3px; background: #1565c0; border-radius: 2px; }
+.question-banner .q-frac .q-den { padding: 2px 8px; }
+.question-banner .q-blank { color: var(--accent); background: #f3e5f5; border: 2px dashed var(--accent); border-radius: 6px; padding: 0 10px; min-width: 36px; text-align: center; }
+
+body.embedded .title-badge { display: none; }
+body.embedded .header { justify-content: space-between; border-bottom: none; margin-bottom: 10px; padding-bottom: 0; }
+body.embedded { background: transparent; padding: 15px; min-height: auto; }
+body.embedded .container { box-shadow: none; border-radius: 0; padding: 1rem; }
+
+@media (max-width: 600px) {
+    .container { padding: 1rem; }
+    .title-badge { font-size: 1.1rem; }
+    .header { justify-content: center; }
+    .header-right { justify-content: center; width: 100%; }
+    .controls-pill { width: 100%; justify-content: center; flex-wrap: wrap; }
+    .math-engine { padding: 20px 8px 8px 8px; gap: 3px; }
+    .fraction-box { width: auto; }
+    
+    .input-wrapper { height: 42px; }
+    .input-wrapper.start-wrap { width: 85px; }
+    .input-wrapper.factor-wrap { width: 80px; }
+    .input-wrapper input { font-size: 1.4rem; }
+    .stepper-btn-group { width: 30px; }
+    .step-btn { font-size: 1.1rem; }
+    
+    .fraction-input[readonly] { font-size: 1.6rem; }
+    .eq-sign { font-size: 1.5rem; margin: 0 2px; }
+    .process-container { min-width: auto; padding: 8px; flex-grow: 1; }
+    .base-num { font-size: 1.3rem; width: 20px; }
+    .op-select { width: 40px; height: 42px; font-size: 1.3rem; padding: 0;}
+    .bar-container { height: 50px; }
+    .bar-label { font-size: 1rem; }
+    .action-btn { width: 110px; font-size: 1.1rem; padding: 10px; }
+    .lang-btn { padding: 6px 14px; font-size: 0.85rem; }
+}
+
+</style>
+<style>
+/* bar-component.css */
+/* bar-component.css
+   Shared design tokens and typography for ALL bar/number-line visualizations.
+   
+   This file provides visual consistency across apps that use different DOM
+   structures for their bar + number line components. It defines:
+   
+   1. Design tokens (CSS custom properties) for bar appearance
+   2. Shared fraction-label typography (.stacked-fraction, .nl-frac, .disp-frac)
+   3. Shared number-line label styles
+   
+   Each app still keeps its own structural CSS (layout, positioning, sizing).
+   This file only overrides look & feel values to create a unified visual language.
+   
+   Load order: this file should come AFTER app-specific structure CSS so that
+   app structural rules are preserved, and token overrides take effect.
+   
+   Apps covered:
+   - 38/45/47/48 (arithmetic): .bar-unit, .bar-fill, .abs-thick-line, .nl-wrap-container
+   - 59 (分數比較): .bar-container, .bar-fill, .divider-thick/.divider-thin, .number-line-*
+   - 64 (相等分數): same as 59 + .anim-line
+   - 66 (整數與分數互換): now uses .bar-unit, .bar-fill, .abs-thin-line (same as arithmetic)
+*/
+
+/* ===== DESIGN TOKENS ===== */
+:root {
+    /* Bar frame */
+    --bar-border-color: #2c3e50;
+    --bar-border-width: 2px;
+    --bar-border-radius: 6px;
+    --bar-bg: #f5f5f5;
+    
+    /* Bar fill */
+    --bar-fill-opacity: 0.8;
+    --bar-fill-transition: width 0.4s ease;
+    
+    /* Grid lines */
+    --grid-thick-width: 3px;
+    --grid-thick-color: #2c3e50;
+    --grid-thin-width: 1px;
+    --grid-thin-color: rgba(44, 62, 80, 0.5);
+    
+    /* Number line */
+    --nl-axis-color: #2c3e50;
+    --nl-axis-height: 2px;
+    --nl-tick-color: #2c3e50;
+    --nl-tick-width: 2px;
+    --nl-tick-height: 12px;
+    --nl-tick-major-height: 18px;
+    --nl-tick-major-width: 3px;
+    
+    /* Fraction labels (used across all number lines and bar labels) */
+    --frac-label-size: 0.85rem;
+    --frac-label-color: #000;
+    --frac-label-weight: bold;
+    --frac-line-height: 1.5px;
+    --frac-line-color: #2c3e50;
+}
+
+
+/* ===== ARITHMETIC APPS (38/45/47/48) — token application ===== */
+
+.bar-unit {
+    border-width: var(--bar-border-width);
+    border-color: var(--bar-border-color);
+    border-radius: var(--bar-border-radius);
+    background: var(--bar-bg);
+}
+
+.bar-wrap-container .bar-fill {
+    opacity: var(--bar-fill-opacity);
+    transition: var(--bar-fill-transition);
+}
+
+.abs-thick-line {
+    width: var(--grid-thick-width);
+    background: var(--grid-thick-color);
+}
+
+.abs-thin-line {
+    width: var(--grid-thin-width);
+    background: var(--grid-thin-color);
+}
+
+.bar-wrap-container.continuous .bar-unit:last-child {
+    border-right-width: var(--bar-border-width);
+    border-right-color: var(--bar-border-color);
+}
+
+
+/* ===== APPS 59/64 — token application ===== */
+
+.bar-container {
+    border-width: var(--bar-border-width);
+    border-color: var(--bar-border-color);
+    border-radius: var(--bar-border-radius);
+    background: var(--bar-bg);
+}
+
+.bar-container .bar-fill {
+    opacity: var(--bar-fill-opacity);
+    transition: var(--bar-fill-transition);
+}
+
+.divider-thick {
+    flex-basis: var(--grid-thick-width);
+    background: var(--grid-thick-color);
+}
+
+.divider-thin {
+    flex-basis: var(--grid-thin-width);
+    background: var(--grid-thin-color);
+}
+
+
+/* ===== APP 66 — now uses same bar-unit structure as arithmetic apps ===== */
+
+
+/* ===== SHARED NUMBER LINE TOKENS ===== */
+
+/* Tick-axis number lines (apps 59, 64) — reinforces number-line.css with tokens */
+.nl-line {
+    background: var(--nl-axis-color);
+    height: var(--nl-axis-height);
+}
+
+.nl-tick {
+    width: var(--nl-tick-width);
+    height: var(--nl-tick-height);
+    background: var(--nl-tick-color);
+}
+
+.nl-tick.major {
+    height: var(--nl-tick-major-height);
+    width: var(--nl-tick-major-width);
+}
+
+
+/* ===== SHARED FRACTION LABEL TYPOGRAPHY ===== */
+/* 
+   Multiple apps render stacked fractions with different class names:
+   - Arithmetic apps (in-bar labels): .inline-frac span, .inline-frac .line
+   - Apps 59/64 (number line labels): .nl-frac, .nl-num, .nl-den, .nl-line-frac
+   - App 59 (bar labels): .disp-frac, .disp-num, .disp-den
+   - App 66 (bar labels): .stacked-fraction, .stacked-fraction .num/.den
+   
+   We standardize the visual appearance with consistent font, weight, line-bar:
+*/
+
+.nl-frac,
+.disp-frac,
+.stacked-fraction {
+    font-size: var(--frac-label-size);
+    font-weight: var(--frac-label-weight);
+    line-height: 1.1;
+}
+
+.nl-line-frac,
+.stacked-fraction .num {
+    border-bottom-color: var(--frac-line-color);
+}
+
+.nl-label {
+    color: var(--frac-label-color);
+    font-weight: var(--frac-label-weight);
+}
+
+/* Consistent fraction divider line appearance */
+.nl-line-frac {
+    height: var(--frac-line-height);
+    background: var(--frac-line-color);
+}
+
+.stacked-fraction .num {
+    border-bottom-width: var(--frac-line-height);
+    border-bottom-style: solid;
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="header-left">
+            <button id="btn_toggle_sync" class="lang-btn btn-active-mode" onclick="toggleSyncMode()">模式1</button>
+            <div class="title-badge" id="title_text">相等分數</div>
+        </div>
+        <div class="header-right">
+            <button class="lang-btn" onclick="swapFractions()">左右互換</button>
+            <button class="lang-btn" onclick="generateRandomFraction()">隨機分數</button>
+            <div class="controls-pill">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="cb_toggle_nl" onchange="toggleNumberLine()"> 顯示數線
+                </label>
+                <div class="divider"></div>
+                <div class="speed-ctrl">
+                    <span id="speed_label">動畫速度: 1.0 x</span>
+                    <input type="range" id="speed_slider" min="0.5" max="3" step="0.1" value="1" oninput="updateSpeedUI(this.value)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="question-banner" id="question_banner">
+        <div class="q-label" id="q_label">在空格內填上正確的數字</div>
+        <div class="q-equation" id="q_equation"></div>
+    </div>
+
+    <div class="control-panel">
+        <button id="btn_merge" class="action-btn btn-merge" onclick="setMode('/')">約分</button>
+        <button id="btn_slice" class="action-btn btn-slice" onclick="setMode('*')">擴分</button>
+    </div>
+
+    <div class="math-engine" id="engine">
+        
+        <div class="fraction-box">
+            <div class="input-wrapper start-wrap">
+                <input type="number" id="n_start" class="num-input" value="2" min="1" max="100" inputmode="numeric" 
+                       onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="manualInputChange()" onblur="checkEmpty(this, 2)">
+                <div class="stepper-btn-group">
+                    <button class="step-btn up" onclick="stepInput('n_start', 1)">+</button>
+                    <button class="step-btn down" onclick="stepInput('n_start', -1)">-</button>
+                </div>
+            </div>
+            
+            <div class="fraction-line"></div>
+            
+            <div class="input-wrapper start-wrap">
+                <input type="number" id="d_start" class="den-input" value="8" min="1" max="100" inputmode="numeric" 
+                       onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="manualInputChange()" onblur="checkEmpty(this, 8)">
+                <div class="stepper-btn-group">
+                    <button class="step-btn up" onclick="stepInput('d_start', 1)">+</button>
+                    <button class="step-btn down" onclick="stepInput('d_start', -1)">-</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="eq-sign" id="eq_left">=</div>
+
+        <div class="process-container">
+            <div class="row-align">
+                <div id="ln" class="base-num num-input">2</div>
+                <div id="on" class="op-select">×</div>
+                <div class="input-wrapper factor-wrap" id="wrap_fn">
+                    <input type="number" id="fn" value="1" min="1" max="20" inputmode="numeric" 
+                           onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="manualFactorChange('fn', this.value)" onblur="checkEmpty(this, 1)">
+                    <div class="stepper-btn-group" id="group_fn">
+                        <button class="step-btn up" onclick="stepFactor('fn', 1)">+</button>
+                        <button class="step-btn down" onclick="stepFactor('fn', -1)">-</button>
+                    </div>
+                </div>
+            </div>
+            <div class="fraction-line" style="margin: 10px 0; background: #000; height: 3px;"></div>
+            <div class="row-align">
+                <div id="ld" class="base-num den-input">8</div>
+                <div id="od" class="op-select">×</div>
+                <div class="input-wrapper factor-wrap" id="wrap_fd">
+                    <input type="number" id="fd" value="1" min="1" max="20" inputmode="numeric" 
+                           onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="manualFactorChange('fd', this.value)" onblur="checkEmpty(this, 1)">
+                    <div class="stepper-btn-group" id="group_fd">
+                        <button class="step-btn up" onclick="stepFactor('fd', 1)">+</button>
+                        <button class="step-btn down" onclick="stepFactor('fd', -1)">-</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="eq-sign">=</div>
+
+        <div class="fraction-box" style="width: 80px;">
+            <input type="text" id="n_target" class="fraction-input num-target" readonly tabindex="-1">
+            <div class="fraction-line"></div>
+            <input type="text" id="d_target" class="fraction-input den-input" readonly tabindex="-1">
+        </div>
+    </div>
+    
+    <div id="error_msg"></div>
+
+    <div class="visual-stack">
+        <div>
+            <div class="bar-label" style="color:var(--accent); justify-content: space-between; display: flex; width: 100%;">
+                <span id="label_result">運算結果</span>
+            </div>
+            <div style="width: 100%; overflow-x: auto; overflow-y: hidden; padding-bottom: 15px; border-radius: 8px; -webkit-overflow-scrolling: touch;">
+                <div id="scale_wrapper" style="width: 100%; min-width: 100%; transition: width 0.3s ease;">
+                    <div class="bar-container" id="container_process" style="border-color: var(--accent); width: 100%;">
+                        <div id="bar_process" class="bar-fill" style="background: var(--accent); opacity: 0.8; pointer-events: none;"></div>
+                        <div id="grid_process" style="pointer-events: none;"></div>
+                    </div>
+                    
+                    <div id="number_line_wrapper" class="number-line-wrapper" style="display: none; width: 100%;">
+                        <div class="number-line-container">
+                            <div class="nl-line"></div>
+                            <div id="nl_ticks"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// FractionApp64.js
+    // Disable right-click
+    document.addEventListener('contextmenu', event => event.preventDefault());
+
+    // Disable keyboard shortcuts
+    document.onkeydown = function(e) {
+    if (e.keyCode === 123) return false;
+    if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) return false;
+    if (e.ctrlKey && (e.keyCode === 67 || e.keyCode === 85 || e.keyCode === 83)) return false;
+};
+
+
+/* ===== next inline <script> block ===== */
+
+const isAnim = true;
+const LIMITS = { den_start: 100, expand_factor: 20 };
+let currentOp = '*'; 
+let showNumberLine = false;
+let isSyncMode = true; // 預設為模式1
+
+let targetNum = null;  
+let targetDen = null;  
+
+function toggleSyncMode() {
+    isSyncMode = !isSyncMode;
+    const btn = document.getElementById('btn_toggle_sync');
+    
+    if (isSyncMode) {
+        btn.innerText = '模式1';
+        btn.classList.add('btn-active-mode');
+        
+        // 切換回同步時，強制對齊數值
+        let val = document.getElementById('fn').value;
+        manualFactorChange('fn', val);
+    } else {
+        btn.innerText = '模式2';
+        btn.classList.remove('btn-active-mode');
+        
+        let fnVal = parseInt(document.getElementById('fn').value) || 1;
+        let fdVal = parseInt(document.getElementById('fd').value) || 1;
+        syncOpColor(currentOp, fnVal, fdVal);
+        renderEverything(true);
+    }
+}
+
+function generateRandomFraction() {
+    let d = Math.floor(Math.random() * 11) + 2; 
+    let n = Math.floor(Math.random() * d) + 1;  
+    
+    if (currentOp === '/') {
+        let multiplier = Math.floor(Math.random() * 4) + 2; 
+        
+        if (d * multiplier > LIMITS.den_start) {
+            multiplier = Math.floor(LIMITS.den_start / d);
+            if (multiplier < 2) multiplier = 2; 
+        }
+        n = n * multiplier;
+        d = d * multiplier;
+        
+        if (d > LIMITS.den_start) {
+            d = LIMITS.den_start;
+            n = Math.floor(d / 2);
+        }
+    }
+
+    document.getElementById('n_start').value = n;
+    document.getElementById('d_start').value = d;
+    
+    document.getElementById('fn').value = 1;
+    document.getElementById('fd').value = 1;
+    syncOpColor(currentOp, 1, 1);
+    
+    renderEverything(true);
+}
+
+function updateSpeedUI(val) {
+    document.getElementById('speed_label').innerText = `動畫速度: ${Number(val).toFixed(1)} x`;
+}
+
+function toggleNumberLine() {
+    showNumberLine = document.getElementById('cb_toggle_nl').checked;
+    document.getElementById('number_line_wrapper').style.display = showNumberLine ? 'block' : 'none';
+}
+
+function swapFractions() {
+    let n_t = document.getElementById('n_target').value;
+    let d_t = document.getElementById('d_target').value;
+    
+    if (n_t === "?" || d_t === "?" || n_t === "" || d_t === "") {
+        return;
+    }
+    
+    let newN = parseInt(n_t);
+    let newD = parseInt(d_t);
+    let fnVal = parseInt(document.getElementById('fn').value) || 1;
+    let fdVal = parseInt(document.getElementById('fd').value) || 1;
+    
+    document.getElementById('n_start').value = newN;
+    document.getElementById('d_start').value = newD;
+    
+    currentOp = (currentOp === '*') ? '/' : '*';
+    const symbol = (currentOp === '*') ? '×' : '÷';
+    document.getElementById('on').innerText = symbol;
+    document.getElementById('od').innerText = symbol;
+    
+    const btnMerge = document.getElementById('btn_merge');
+    const btnSlice = document.getElementById('btn_slice');
+    
+    if (currentOp === '/') {
+        btnMerge.disabled = true;
+        btnSlice.disabled = false;
+    } else {
+        btnSlice.disabled = true;
+        btnMerge.disabled = false;
+    }
+    
+    document.getElementById('fn').value = fnVal;
+    document.getElementById('fd').value = fdVal;
+    
+    syncOpColor(currentOp, fnVal, fdVal);
+    renderEverything(true);
+}
+
+// 更新支援超出版面的數線繪製
+function drawNumberLine(d_val, total_segments) {
+    const container = document.getElementById('nl_ticks');
+    if(!container) return;
+    let html = '';
+    for (let i = 0; i <= total_segments; i++) {
+        let leftPos = (i / total_segments) * 100;
+        let labelHtml = '';
+        
+        if (i === 0) {
+            labelHtml = '0';
+        } else if (i === d_val) {
+            labelHtml = '1';
+        } else if (i % d_val === 0) {
+            labelHtml = (i / d_val).toString();
+        } else {
+            labelHtml = `
+                <span class="nl-frac">
+                    <span class="nl-num">${i}</span>
+                    <span class="nl-line-frac"></span>
+                    <span class="nl-den">${d_val}</span>
+                </span>
+            `;
+        }
+        
+        html += `
+            <div class="nl-tick-wrapper" style="left: ${leftPos}%;">
+                <div class="nl-tick"></div>
+                <div class="nl-label">${labelHtml}</div>
+            </div>
+        `;
+    }
+    container.innerHTML = html;
+}
+
+function renderQuestionBanner() {
+    const banner = document.getElementById('question_banner');
+    if (targetNum === null && targetDen === null) { banner.classList.remove('show'); return; }
+
+    const n = parseInt(document.getElementById('n_start').value) || 0;
+    const d = parseInt(document.getElementById('d_start').value) || 1;
+
+    const tNumHtml = targetNum !== null ? targetNum : '<span class="q-blank">?</span>';
+    const tDenHtml = targetDen !== null ? targetDen : '<span class="q-blank">?</span>';
+
+    document.getElementById('q_equation').innerHTML = 
+        '<span class="q-frac"><span class="q-num">' + n + '</span><span class="q-line"></span><span class="q-den">' + d + '</span></span>' +
+        '<span>=</span>' +
+        '<span class="q-frac"><span class="q-num">' + tNumHtml + '</span><span class="q-line"></span><span class="q-den">' + tDenHtml + '</span></span>';
+
+    banner.classList.add('show');
+}
+
+function setMode(op) {
+    currentOp = op;
+    const symbol = (op === '*') ? '×' : '÷';
+    document.getElementById('on').innerText = symbol;
+    document.getElementById('od').innerText = symbol;
+    
+    document.getElementById('fn').value = 1;
+    document.getElementById('fd').value = 1;
+    
+    const btnMerge = document.getElementById('btn_merge');
+    const btnSlice = document.getElementById('btn_slice');
+    
+    if (op === '/') {
+        btnMerge.disabled = true;
+        btnSlice.disabled = false;
+    } else {
+        btnSlice.disabled = true;
+        btnMerge.disabled = false;
+    }
+    
+    syncOpColor(op, 1, 1);
+    renderEverything(true);
+}
+
+function checkEmpty(el, defaultVal) {
+    if (el.value === "" || isNaN(el.value)) {
+        el.value = defaultVal;
+        if(el.id === 'fn' || el.id === 'fd') manualFactorChange(el.id, defaultVal);
+        else manualInputChange();
+    }
+}
+
+function stepInput(id, delta) {
+    let el = document.getElementById(id);
+    let val = parseInt(el.value) || 0;
+    val += delta;
+    
+    if (id === 'd_start' && val < 1) val = 1;
+    if (id === 'n_start' && val < 0) val = 0;
+    
+    el.value = val;
+    manualInputChange();
+}
+
+function manualInputChange() {
+    let n = parseInt(document.getElementById('n_start').value);
+    let d = parseInt(document.getElementById('d_start').value);
+    
+    if (isNaN(d) || isNaN(n)) return;
+
+    if (d > LIMITS.den_start) d = LIMITS.den_start;
+    if (d < 1) d = 1;
+    if (n > d) n = d; 
+    if (n < 0) n = 0;
+
+    document.getElementById('n_start').value = n;
+    document.getElementById('d_start').value = d;
+
+    renderEverything(true);
+}
+
+function stepFactor(id, delta) {
+    let val = parseInt(document.getElementById(id).value) || 1;
+    val += delta;
+    manualFactorChange(id, val);
+}
+
+function manualFactorChange(id, v) {
+    if (v === "") return; 
+    
+    let val = parseInt(v) || 1;
+    if(val < 1) val = 1;
+
+    const maxLimit = currentOp === '*' ? LIMITS.expand_factor : LIMITS.den_start;
+    if(val > maxLimit) val = maxLimit;
+
+    document.getElementById(id).value = val;
+
+    if (isSyncMode) {
+        let otherId = id === 'fn' ? 'fd' : 'fn';
+        document.getElementById(otherId).value = val;
+    }
+
+    let fnVal = parseInt(document.getElementById('fn').value) || 1;
+    let fdVal = parseInt(document.getElementById('fd').value) || 1;
+
+    syncOpColor(currentOp, fnVal, fdVal);
+    renderEverything(true); 
+}
+
+function syncOpColor(op, fnVal, fdVal) {
+    let isMismatch = !isSyncMode && (fnVal !== fdVal);
+    
+    let themeColor = 'var(--red)';
+    let textColor = 'var(--red)';
+    let baseColor = fnVal === 1 ? '#000' : (op === '*' ? 'var(--yellow)' : 'var(--success)');
+    
+    if (!isMismatch) {
+        themeColor = baseColor;
+        textColor = fnVal === 1 ? '#000' : themeColor;
+    }
+
+    document.querySelectorAll('.op-select').forEach(el => {
+        el.style.borderColor = baseColor;
+        el.style.color = fnVal === 1 ? '#000' : baseColor;
+    });
+
+    document.getElementById('wrap_fn').style.borderColor = isMismatch ? 'var(--red)' : baseColor;
+    document.getElementById('wrap_fd').style.borderColor = isMismatch ? 'var(--red)' : (fdVal === 1 && !isMismatch ? '#000' : (op === '*' ? 'var(--yellow)' : 'var(--success)'));
+
+    document.querySelectorAll('#wrap_fn input, #wrap_fn .step-btn, #wrap_fd input, #wrap_fd .step-btn').forEach(el => {
+        el.style.color = textColor;
+    });
+    
+    document.getElementById('group_fn').style.borderLeftColor = isMismatch ? 'var(--red)' : '#000';
+    document.getElementById('group_fd').style.borderLeftColor = isMismatch ? 'var(--red)' : '#000';
+}
+
+function renderEverything(anim) {
+    const n1 = parseInt(document.getElementById('n_start').value) || 2;
+    const d1 = parseInt(document.getElementById('d_start').value) || 8;
+    const elFn = document.getElementById('fn');
+    const elFd = document.getElementById('fd');
+    const fnVal = elFn && elFn.value !== "" ? parseInt(elFn.value) : 1;
+    const fdVal = elFd && elFd.value !== "" ? parseInt(elFd.value) : 1;
+    
+    document.getElementById('ln').innerText = n1;
+    document.getElementById('ld').innerText = d1;
+    const errorEl = document.getElementById('error_msg');
+    errorEl.innerText = "";
+
+    let canCalculate = true;
+    let isNumMismatch = !isSyncMode && (fnVal !== fdVal);
+
+    if (currentOp === '/') {
+        if(fnVal === 0 || fdVal === 0) { canCalculate = false; }
+        else if(n1 % fnVal !== 0 || d1 % fdVal !== 0) {
+            if (errorEl.innerText !== "") errorEl.innerText += "\n";
+            errorEl.innerText += `⚠️ 錯誤：分子不能被 ${fnVal} 整除，或分母不能被 ${fdVal} 整除`;
+            canCalculate = false;
+        }
+    }
+
+    // 若分子分母乘除數目不同，僅顯示提示並改變 = 為 ≠，但依然計算顯示結果
+    if (isNumMismatch) {
+        if (errorEl.innerText !== "") errorEl.innerText += "\n";
+        errorEl.innerText += "⚠️ 提示：分子和分母乘以或除以不同的數字，分數值已改變。";
+    }
+    
+    let eqLeft = document.getElementById('eq_left');
+    if (eqLeft) {
+        if (isNumMismatch && canCalculate) {
+            eqLeft.innerText = '≠';
+            eqLeft.style.color = 'var(--red)';
+        } else {
+            eqLeft.innerText = '=';
+            eqLeft.style.color = '#000';
+        }
+    }
+
+    let n2 = canCalculate ? ((currentOp === '*') ? n1 * fnVal : n1 / fnVal) : "?";
+    let d2 = canCalculate ? ((currentOp === '*') ? d1 * fdVal : d1 / fdVal) : "?";
+    
+    document.getElementById('n_target').value = n2;
+    document.getElementById('d_target').value = d2;
+
+    const bp = document.getElementById('bar_process');
+    const gp = document.getElementById('grid_process');
+    const nlContainer = document.querySelector('.number-line-container');
+    const scaleWrapper = document.getElementById('scale_wrapper');
+
+    if (canCalculate) {
+        if (bp) bp.style.visibility = 'visible';
+        if (gp) gp.style.visibility = 'visible';
+        if (nlContainer) nlContainer.style.visibility = 'visible';
+        if (scaleWrapper) scaleWrapper.style.filter = 'grayscale(0%)';
+        
+        drawProcess(n1, d1, n2, d2, fnVal, fdVal, currentOp, anim);
+        
+        let maxGrid = (currentOp === '*') ? d2 : d1;
+        let ratio = n2 / d2;
+        let scale = Math.max(1, ratio);
+        let drawSegments = Math.max(maxGrid, Math.round(maxGrid * scale));
+        
+        drawNumberLine(maxGrid, drawSegments);
+    } else {
+        // 如果無法計算 (約分除不盡)，才套用灰階濾鏡
+        if (scaleWrapper) scaleWrapper.style.filter = 'grayscale(100%)';
+    }
+}
+
+// 更新長條圖繪製機制，支援延伸畫面
+function drawProcess(n1, d1, n2, d2, fnVal, fdVal, op, anim) {
+    const b = document.getElementById('bar_process');
+    const g = document.getElementById('grid_process');
+    const scaleWrapper = document.getElementById('scale_wrapper');
+    if(!b || !g || !scaleWrapper) return;
+
+    let maxGrid = (op === '*') ? d2 : d1;
+    let ratio = n2 / d2;
+    let scale = Math.max(1, ratio);
+    let drawSegments = Math.max(maxGrid, Math.round(maxGrid * scale));
+
+    // 動態調整外層容器寬度，若比例大於1，容器會延長 (如 125%, 200%)，從而出現捲軸
+    scaleWrapper.style.width = (scale * 100) + '%';
+    
+    // Bar長度的比例是依照 scaleWrapper 來算
+    b.style.width = ((ratio / scale) * 100) + '%';
+    
+    let html = '<div class="grid-overlay">';
+    
+    let maxFactor = Math.max(fnVal, fdVal);
+    let baseAnimDuration = 4.0;
+    let baseBgTimeout = 3800; 
+    if (maxFactor > 3) {
+        baseAnimDuration = 2.0;
+        baseBgTimeout = 1800;
+    }
+
+    const speedVal = parseFloat(document.getElementById('speed_slider').value);
+    let animDuration = (baseAnimDuration / speedVal) + 's';
+    let bgTimeout = baseBgTimeout / speedVal;
+
+    for(let i=1; i <= drawSegments; i++) {
+        html += `<div class="segment"></div>`;
+
+        if (i < drawSegments) {
+            // 以分母的變化 (fdVal) 來決定分割線
+            const isMainLine = (i % fdVal === 0 && op === '/') || (op === '*' && i % fdVal === 0);
+
+            if (op === '*') {
+                if (isMainLine || fdVal === 1) {
+                    html += `<div class="divider-thick"></div>`;
+                } else {
+                    const hS = anim ? '0%' : '100%';
+                    html += `<div class="divider-thin"><div class="anim-line" style="height:${hS}; background: var(--accent); transition: height ${animDuration} cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s;"></div></div>`;
+                }
+            } else {
+                if (fdVal === 1) {
+                    html += `<div class="divider-thick"></div>`;
+                } else if (isMainLine) {
+                    html += `<div class="divider-thick"></div>`;
+                } else {
+                    const hS = anim ? '100%' : '0%';
+                    html += `<div class="divider-thin"><div class="anim-line" style="height:${hS}; background: var(--grid-dark); transition: height ${animDuration} cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s;"></div></div>`;
+                }
+            }
+        }
+    }
+    html += '</div>';
+    g.innerHTML = html;
+
+    if (anim && fdVal !== 1) {
+        setTimeout(() => {
+            const lines = g.querySelectorAll('.anim-line');
+            lines.forEach(l => {
+                l.style.height = (op === '*') ? '100%' : '0%';
+                if(op === '*') setTimeout(() => l.style.background = 'var(--grid-dark)', bgTimeout); 
+            });
+        }, 50);
+    }
+}
+
+window.onload = function() {
+    try { if (window.self !== window.top) document.body.classList.add('embedded'); } catch(e) { document.body.classList.add('embedded'); }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const pNum = parseInt(urlParams.get('numerator'));
+    const pDen = parseInt(urlParams.get('denominator'));
+    const pMode = urlParams.get('mode'); 
+    const pTargetNum = urlParams.get('targetNum');
+    const pTargetDen = urlParams.get('targetDen');
+
+    if (pTargetNum !== null && pTargetNum !== '') targetNum = parseInt(pTargetNum);
+    if (pTargetDen !== null && pTargetDen !== '') targetDen = parseInt(pTargetDen);
+
+    if (!isNaN(pNum) && !isNaN(pDen) && pDen >= 1) {
+        document.getElementById('n_start').value = Math.min(pNum, pDen);
+        document.getElementById('d_start').value = Math.min(pDen, LIMITS.den_start);
+    }
+
+    if (pMode === 'simplify') {
+        setMode('/');
+    } else {
+        setMode('*');
+    }
+
+    renderQuestionBanner();
+    manualInputChange();
+
+    window.addEventListener('message', function(e) {
+        if (e.data && e.data.type === 'set-params') {
+            const p = e.data.params;
+            if (p.targetNum !== undefined) targetNum = p.targetNum;
+            if (p.targetDen !== undefined) targetDen = p.targetDen;
+            if (p.numerator != null && p.denominator != null) {
+                document.getElementById('n_start').value = Math.min(p.numerator, p.denominator);
+                document.getElementById('d_start').value = Math.min(p.denominator, LIMITS.den_start);
+            }
+            if (p.mode === 'simplify') setMode('/');
+            else setMode('*');
+            renderQuestionBanner();
+            manualInputChange();
+        }
+    });
+};
+
+</script>
+</body>
+</html>
