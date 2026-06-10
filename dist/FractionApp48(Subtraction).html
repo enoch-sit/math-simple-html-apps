@@ -819,7 +819,7 @@ body {
                 </label>
                 <span class="divider"></span>
                 <label class="checkbox-label">
-                    <input type="checkbox" id="show-nl-cb" checked onchange="toggleNumberLine()"> 顯示數線
+                    <input type="checkbox" id="show-nl-cb" onchange="toggleNumberLine()"> 顯示數線
                 </label>
                 <span class="divider"></span>
                 <div class="speed-ctrl">
@@ -1389,13 +1389,13 @@ function trashPieces(block, num, cd) {
                 }
             });
 
-            // 動畫結束後完全隱藏節點
+            // 動畫結束後完全隱藏節點，然後才顯示結果
             setTimeout(() => { 
                 if(row1) row1.style.display = 'none'; 
                 if(row2) row2.style.display = 'none'; 
+                showFinalAnswerBar(); showAnswerZone(); 
             }, 850);
 
-            showFinalAnswerBar(); showAnswerZone(); 
         }, animDuration + 50);
     }
 }

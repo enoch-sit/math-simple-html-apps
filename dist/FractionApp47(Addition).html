@@ -832,7 +832,7 @@ body {
                 </label>
                 <span class="divider"></span>
                 <label class="checkbox-label">
-                    <input type="checkbox" id="show-nl-cb" checked onchange="toggleNumberLine()"> 顯示數線
+                    <input type="checkbox" id="show-nl-cb" onchange="toggleNumberLine()"> 顯示數線
                 </label>
                 <span class="divider"></span>
                 <div class="speed-ctrl">
@@ -1107,29 +1107,32 @@ document.onkeydown = function(e) {
  }
 
  function toggleNumberLine() {
-     if (bar1Visible) renderBar(1, 'none');
-     if (bar2Visible) renderBar(2, 'none');
-     
-     const vals = getSafeValues();
-     let cd1 = vals.d1 * s1;
-     
-     // 更新正確合併列的數線
-     let bar3Row = document.getElementById('bar3-row');
-     if (bar3Row && bar3Row.style.display !== 'none') {
-         if (isCommonDenomReady) {
-             renderBar3NumberLine(cd1);
-         }
-     }
+     const showNL = document.getElementById('show-nl-cb').checked;
 
-     // 更新錯誤合併列的數線
-     let errorRow = document.getElementById('bar-error-row');
-     if (errorRow && errorRow.style.display !== 'none') {
-         let errorNl = document.getElementById('bar-error-nl');
-         const showNL = document.getElementById('show-nl-cb').checked;
-         if (showNL) {
-             errorNl.style.display = 'flex';
-         } else {
-             errorNl.style.display = 'none';
+     // 切換現有數線的顯示，避免重建整個長條圖造成畫面跳動
+     ['bar1-nl', 'bar2-nl', 'bar3-nl', 'bar-error-nl'].forEach(id => {
+         let nlWrap = document.getElementById(id);
+         if (nlWrap && nlWrap.innerHTML.trim() !== '') {
+             nlWrap.style.display = showNL ? 'flex' : 'none';
+         }
+     });
+
+     // 若數線尚未渲染（例如尚未點擊分數），則在顯示時補渲染
+     if (showNL) {
+         if (bar1Visible) {
+             let nl1 = document.getElementById('bar1-nl');
+             if (nl1 && nl1.innerHTML.trim() === '') renderBar(1, 'none');
+         }
+         if (bar2Visible) {
+             let nl2 = document.getElementById('bar2-nl');
+             if (nl2 && nl2.innerHTML.trim() === '') renderBar(2, 'none');
+         }
+         // 更新合併列的數線
+         const vals = getSafeValues();
+         let cd1 = vals.d1 * s1;
+         let bar3Row = document.getElementById('bar3-row');
+         if (bar3Row && bar3Row.style.display !== 'none' && isCommonDenomReady) {
+             renderBar3NumberLine(cd1);
          }
      }
  }

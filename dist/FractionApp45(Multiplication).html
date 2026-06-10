@@ -839,7 +839,7 @@ body {
                 </label>
                 <span class="divider"></span>
                 <label class="checkbox-label">
-                    <input type="checkbox" id="show-nl-cb" checked onchange="toggleNumberLine()"> 顯示數線
+                    <input type="checkbox" id="show-nl-cb" onchange="toggleNumberLine()"> 顯示數線
                 </label>
                 <span class="divider"></span>
                 <div class="speed-ctrl">
@@ -1035,6 +1035,7 @@ function toggleNumberLine() {
     if (isPhase1OrLater) {
         let nlWrap = document.getElementById('bar1-nl');
         if (nlWrap) nlWrap.style.display = 'none';
+        document.getElementById('show-nl-cb').checked = false;
         return;
     }
 
@@ -1220,8 +1221,12 @@ function onFrac2Click() {
     currentTutorialStep = 2; // 更新狀態避免干擾動畫
     hideFinger();
     
-    document.getElementById('label1').style.opacity = '0';
+    // 動畫進行中鎖定數線切換按鈕
+    let nlCb = document.getElementById('show-nl-cb');
+    if (nlCb) { nlCb.disabled = true; nlCb.checked = false; }
     document.getElementById('bar1-nl').style.display = 'none';
+
+    document.getElementById('label1').style.opacity = '0';
 
     const vals = getSafeValues();
     let A = vals.total_n1, B = vals.d1;
@@ -1342,6 +1347,10 @@ function finishAnimation() {
     currentTutorialStep = 2; // 動畫結束，進入下一步驟：提示點擊長條圖
     clearTimeout(idleTimer);
     idleTimer = setTimeout(showIdleHint, 3000);
+
+    // 解鎖數線切換按鈕（動畫結束後可再操作，但 isPhase1OrLater 仍為 true 所以 NL 保持隱藏）
+    let nlCb = document.getElementById('show-nl-cb');
+    if (nlCb) nlCb.disabled = false;
     
     document.getElementById('drag-instruction').innerHTML = `💡 現在，根據最終顯示的紅色方塊填寫答案吧！（可點擊長條圖重新排列方塊）`;
     
@@ -1407,16 +1416,17 @@ function toggleRearrange() {
             preRearrangePositions.push({ left: b.el.style.left, unit: b.el.parentElement });
             
             let ghost = document.createElement('div');
-            ghost.style.position = 'absolute';
-            ghost.style.left = `${rect.left - wrapRect.left}px`;
-            ghost.style.top = `${rect.top - wrapRect.top}px`;
+            ghost.style.position = 'fixed';
+            ghost.style.left = `${rect.left}px`;
+            ghost.style.top = `${rect.top}px`;
             ghost.style.width = `${rect.width}px`;
             ghost.style.height = `${rect.height}px`;
             ghost.style.backgroundColor = 'var(--red)';
             ghost.style.opacity = '0.85';
             ghost.style.transition = 'all 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
             ghost.style.zIndex = '100';
-            wrap.appendChild(ghost);
+            ghost.style.pointerEvents = 'none';
+            document.body.appendChild(ghost);
             ghosts.push(ghost);
             
             b.el.style.visibility = 'hidden'; 
@@ -1429,8 +1439,8 @@ function toggleRearrange() {
                 let targetUnit = document.getElementById(`unit-${unitIdx}`);
                 let tRect = targetUnit.getBoundingClientRect();
                 
-                let targetLeft = tRect.left - wrapRect.left + (rem * (tRect.width / slotsPerUnit));
-                let targetTop = tRect.top - wrapRect.top;
+                let targetLeft = tRect.left + (rem * (tRect.width / slotsPerUnit));
+                let targetTop = tRect.top;
                 
                 ghost.style.left = `${targetLeft}px`;
                 ghost.style.top = `${targetTop}px`;
@@ -1458,16 +1468,17 @@ function toggleRearrange() {
         animBlocks.forEach((b) => {
             let rect = b.el.getBoundingClientRect();
             let ghost = document.createElement('div');
-            ghost.style.position = 'absolute';
-            ghost.style.left = `${rect.left - wrapRect.left}px`;
-            ghost.style.top = `${rect.top - wrapRect.top}px`;
+            ghost.style.position = 'fixed';
+            ghost.style.left = `${rect.left}px`;
+            ghost.style.top = `${rect.top}px`;
             ghost.style.width = `${rect.width}px`;
             ghost.style.height = `${rect.height}px`;
             ghost.style.backgroundColor = 'var(--red)';
             ghost.style.opacity = '0.85';
             ghost.style.transition = 'all 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
             ghost.style.zIndex = '100';
-            wrap.appendChild(ghost);
+            ghost.style.pointerEvents = 'none';
+            document.body.appendChild(ghost);
             ghosts.push(ghost);
             
             b.el.style.visibility = 'hidden';
@@ -1480,8 +1491,8 @@ function toggleRearrange() {
                 animBlocks[i].el.style.left = orig.left;
                 
                 let tRect = animBlocks[i].el.getBoundingClientRect();
-                ghost.style.left = `${tRect.left - wrapRect.left}px`;
-                ghost.style.top = `${tRect.top - wrapRect.top}px`;
+                ghost.style.left = `${tRect.left}px`;
+                ghost.style.top = `${tRect.top}px`;
             });
         }, 50);
         

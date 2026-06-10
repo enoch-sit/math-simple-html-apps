@@ -561,9 +561,9 @@ select.lang-btn { appearance: none; padding-right: 30px; background: url('data:i
                     <input type="checkbox" id="cb_toggle_nl" onchange="toggleNumberLine()"> 顯示數線
                 </label>
                 <span class="divider"></span>
-                <button class="lang-btn" id="btn-fmt-mixed" onclick="setFormatGlobal('mixed')" style="border-color:#34495e; color:#34495e; box-shadow:0 3px 0 #34495e; padding:4px 10px; font-size:0.85rem;">帶分數</button>
                 <button class="lang-btn" id="btn-fmt-integer" onclick="setFormatGlobal('integer')" style="padding:4px 10px; font-size:0.85rem;">整數</button>
                 <button class="lang-btn" id="btn-fmt-fraction" onclick="setFormatGlobal('fraction')" style="padding:4px 10px; font-size:0.85rem;">分數</button>
+                <button class="lang-btn" id="btn-fmt-mixed" onclick="setFormatGlobal('mixed')" style="padding:4px 10px; font-size:0.85rem;">帶分數</button>
             </div>
         </div>
     </div>
@@ -689,11 +689,12 @@ function toggleNumberLine() {
     wrappers.forEach(w => w.style.display = showNL ? 'block' : 'none');
 }
 
-// 手動輸入與防呆 (修改：限制最小1，最大99)
+// 手動輸入與防呆 (w 欄位最小0，其他欄位最小1，最大99)
 function handleInput(index, field, value) {
     let val = parseInt(value);
-    if (isNaN(val)) val = 1;
-    if (val < 1) val = 1;
+    let minVal = (field === 'w') ? 0 : 1;
+    if (isNaN(val)) val = minVal;
+    if (val < minVal) val = minVal;
     if (val > 99) val = 99;
 
     state[index][field] = val;
@@ -701,14 +702,15 @@ function handleInput(index, field, value) {
     updateVisuals();
 }
 
-// 按鈕加減控制 (修改：限制最小1，最大99)
+// 按鈕加減控制 (w 欄位最小0，其他欄位最小1，最大99)
 function stepVal(index, field, delta) {
     let el = document.getElementById(`input_${index}_${field}`);
     let val = parseInt(el.value);
-    if (isNaN(val)) val = 1;
+    let minVal = (field === 'w') ? 0 : 1;
+    if (isNaN(val)) val = minVal;
     val += delta;
     
-    if (val < 1) val = 1;
+    if (val < minVal) val = minVal;
     if (val > 99) val = 99;
     
     el.value = val;
@@ -723,7 +725,7 @@ function renderInputs() {
 
     const makeWrapper = (i, field, val, max, min=0, extraClass='') => `
         <div class="input-wrapper ${extraClass}">
-            <input type="number" id="input_${i}_${field}" value="${val}" min="1" max="99"
+            <input type="number" id="input_${i}_${field}" value="${val}" min="${field === 'w' ? 0 : 1}" max="99"
                    oninput="handleInput(${i}, '${field}', this.value)">
             <div class="stepper-btn-group">
                 <button class="step-btn up" onclick="stepVal(${i}, '${field}', 1)">+</button>
