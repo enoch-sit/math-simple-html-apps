@@ -14,9 +14,9 @@ body { font-family: 'PingFang HK', 'Microsoft JhengHei', 'Noto Sans TC', sans-se
 select.lang-btn { appearance: none; padding-right: 30px; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 10px center; }
 
 /* 數值輸入區 (中間) - 加入 min-height 確保高度固定 */
-.math-engine { position: relative; display: flex; align-items: center; justify-content: center; gap: 20px; margin: 15px 0 30px 0; padding: 30px 15px 45px 15px; border-radius: 20px; background: #fdfdfd; border: 2px solid #eee; flex-wrap: wrap; min-height: 200px; }
+.math-engine { position: relative; display: flex; align-items: center; justify-content: center; gap: 14px; margin: 15px 0 30px 0; padding: 30px 12px 45px 12px; border-radius: 20px; background: #fdfdfd; border: 2px solid #eee; flex-wrap: wrap; min-height: 200px; }
 
-.input-card { position: relative; display: flex; align-items: center; justify-content: center; background: #fff; padding: 15px 25px; border-radius: 12px; border: 3px solid #ccc; box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: context-menu; touch-action: none; user-select: none; transition: 0.2s; min-height: 120px; flex-wrap: wrap; }
+.input-card { position: relative; display: flex; align-items: center; justify-content: center; background: #fff; padding: 14px 16px; border-radius: 12px; border: 3px solid #ccc; box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: context-menu; touch-action: none; user-select: none; transition: 0.2s; min-height: 120px; flex-wrap: wrap; }
 .input-card:hover { border-color: #bbb; }
 
 /* Per-card controls row */
@@ -26,12 +26,12 @@ select.lang-btn { appearance: none; padding-right: 30px; background: url('data:i
 .card-controls .card-fmt-btn { padding: 3px 8px !important; font-size: 0.78rem !important; }
 
 .fraction-group { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-.mixed-group { display: flex; align-items: center; gap: 10px; }
+.mixed-group { display: flex; align-items: center; gap: 6px; }
 .fraction-line { width: 100%; height: 4px; background: var(--grid-dark); border-radius: 2px; }
 
 /* 封裝好的加減輸入元件 */
-.input-wrapper { display: flex; align-items: center; border-radius: 8px; background: white; overflow: hidden; height: 45px; border: 2px solid #ccc; box-sizing: border-box; width: 75px; }
-.input-wrapper.wrapper-w { width: 85px; height: 60px; }
+.input-wrapper { display: flex; align-items: center; border-radius: 8px; background: white; overflow: hidden; height: 45px; border: 2px solid #ccc; box-sizing: border-box; width: 66px; }
+.input-wrapper.wrapper-w { width: 74px; height: 60px; }
 .input-wrapper input { flex: 1; width: 100%; height: 100%; border: none; outline: none; text-align: center; font-size: 1.5rem; font-weight: bold; background: transparent; -moz-appearance: textfield; color: #333; padding: 0; }
 .input-wrapper.wrapper-w input { font-size: 2rem; }
 .input-wrapper input::-webkit-inner-spin-button, .input-wrapper input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }

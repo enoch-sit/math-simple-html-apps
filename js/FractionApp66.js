@@ -228,7 +228,7 @@ function renderBars(w, n, d, height) {
             if (valRem === 0) {
                 labelContent = `<span style="font-weight:bold; font-size:15px; color:var(--integer-green, #009900);">${valWhole}</span>`;
             } else {
-                const fracHtml = `<span class="nl-frac"><span class="nl-num" style="color:var(--primary-red, #ff3333);">${valRem}</span><span class="nl-line-frac"></span><span class="nl-den" style="color:var(--bar-border-color, #2c3e50);">${displayD}</span></span>`;
+                const fracHtml = `<span class="nl-frac"><span class="nl-num" style="color:var(--primary-red, #ff3333);">${valRem}</span><span class="nl-line-frac"></span><span class="nl-den" style="color:var(--primary-blue, #3333ff);">${displayD}</span></span>`;
                 if (valWhole === 0) {
                     labelContent = fracHtml;
                 } else {
@@ -271,7 +271,7 @@ function renderText(w, n, d) {
 
     let convertHtml = '';
     
-    const fFrac = (nu, de) => `<span class="nl-frac" style="font-size:1.1rem;"><span class="nl-num" style="color:var(--primary-red, #ff3333);">${nu}</span><span class="nl-line-frac"></span><span class="nl-den" style="color:var(--bar-border-color, #2c3e50);">${de}</span></span>`;
+    const fFrac = (nu, de) => `<span class="nl-frac" style="font-size:1.1rem;"><span class="nl-num" style="color:var(--primary-red, #ff3333);">${nu}</span><span class="nl-line-frac"></span><span class="nl-den" style="color:var(--primary-blue, #3333ff);">${de}</span></span>`;
     const fMix = (wh, nu, de) => `<span style="display:inline-flex; align-items:center; gap:4px;"><span style="font-weight:bold; font-size:1.1em; color:var(--integer-green, #009900);">${wh}</span>${fFrac(nu, de)}</span>`;
 
     if (totalNum > 0 && !(w === 0 && n === totalNum)) {
