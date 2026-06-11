@@ -14,7 +14,7 @@
 const isAnim = true;
 const LIMITS = { den_start: 100, expand_factor: 20 };
 let currentOp = '*'; 
-let showNumberLine = false;
+let showNumberLine = true;
 let isSyncMode = true; // 預設為模式1
 
 let targetNum = null;  

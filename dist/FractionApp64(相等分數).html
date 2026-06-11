@@ -7,7 +7,7 @@
 
 <style>
 /* nav.css */
-﻿/* nav.css
+/* nav.css
    Shared header/navigation bar style based on App64's design.
    Used by all apps that adopt the unified nav look.
 
@@ -575,7 +575,7 @@ body.embedded .container { box-shadow: none; border-radius: 0; padding: 1rem; }
             <button class="lang-btn" onclick="generateRandomFraction()">隨機分數</button>
             <div class="controls-pill">
                 <label class="checkbox-label">
-                    <input type="checkbox" id="cb_toggle_nl" onchange="toggleNumberLine()"> 顯示數線
+                    <input type="checkbox" id="cb_toggle_nl" onchange="toggleNumberLine()" checked> 顯示數線
                 </label>
                 <div class="divider"></div>
                 <div class="speed-ctrl">
@@ -673,7 +673,7 @@ body.embedded .container { box-shadow: none; border-radius: 0; padding: 1rem; }
                         <div id="grid_process" style="pointer-events: none;"></div>
                     </div>
                     
-                    <div id="number_line_wrapper" class="number-line-wrapper" style="display: none; width: 100%;">
+                    <div id="number_line_wrapper" class="number-line-wrapper" style="display: block; width: 100%;">
                         <div class="number-line-container">
                             <div class="nl-line"></div>
                             <div id="nl_ticks"></div>
@@ -703,7 +703,7 @@ body.embedded .container { box-shadow: none; border-radius: 0; padding: 1rem; }
 const isAnim = true;
 const LIMITS = { den_start: 100, expand_factor: 20 };
 let currentOp = '*'; 
-let showNumberLine = false;
+let showNumberLine = true;
 let isSyncMode = true; // 預設為模式1
 
 let targetNum = null;  

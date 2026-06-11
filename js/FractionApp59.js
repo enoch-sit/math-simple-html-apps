@@ -28,7 +28,7 @@ let vOffsets = [0, 0, 0]; // 記錄每個圖表的垂直偏移量
 
 let activeCount = 2;
 let targetIndexForMenu = 0;
-let showNL = false;
+let showNL = true;
 let pressTimer;
 let isSyncMode = true; // 模式1：鎖定長度100%
 
@@ -100,6 +100,11 @@ function matchBars() {
 
 function toggleNumberLine() {
     showNL = document.getElementById('cb_toggle_nl').checked;
+    // Sync per-card checkboxes
+    for (let i = 0; i < activeCount; i++) {
+        const c = document.getElementById(`cb_nl_${i}`);
+        if (c) c.checked = showNL;
+    }
     const wrappers = document.querySelectorAll('.number-line-wrapper');
     wrappers.forEach(w => w.style.display = showNL ? 'block' : 'none');
 }
@@ -185,9 +190,50 @@ function renderInputs() {
                 </div>`;
         }
 
+        // Per-card controls row (number line toggle + format buttons)
+        const fmtActive = (fmt) => data.format === fmt
+            ? 'border-color:#34495e; color:#34495e; box-shadow:0 3px 0 #34495e;'
+            : '';
+        contentHtml += `
+            <div class="card-controls">
+                <label class="checkbox-label card-cb">
+                    <input type="checkbox" id="cb_nl_${i}" onchange="toggleNumberLineCard(${i})" ${showNL ? 'checked' : ''}> 數線
+                </label>
+                <span class="card-divider"></span>
+                <button class="lang-btn card-fmt-btn" onclick="setFormatCard(${i}, 'integer')" style="${fmtActive('integer')}">整數</button>
+                <button class="lang-btn card-fmt-btn" onclick="setFormatCard(${i}, 'fraction')" style="${fmtActive('fraction')}">分數</button>
+                <button class="lang-btn card-fmt-btn" onclick="setFormatCard(${i}, 'mixed')" style="${fmtActive('mixed')}">帶分數</button>
+            </div>
+        `;
+
         card.innerHTML = contentHtml;
         container.appendChild(card);
     }
+}
+
+// Per-card format change (no right-click needed)
+function setFormatCard(index, format) {
+    state[index].format = format;
+    if (format === 'integer') state[index].n = 1;
+    if (format === 'fraction') state[index].w = 1;
+    renderInputs();
+    updateVisuals();
+}
+
+// Per-card number line toggle
+function toggleNumberLineCard(index) {
+    const cb = document.getElementById(`cb_nl_${index}`);
+    if (!cb) return;
+    // Sync all per-card checkboxes and the global one
+    showNL = cb.checked;
+    document.getElementById('cb_toggle_nl').checked = showNL;
+    // Update all per-card checkboxes
+    for (let i = 0; i < activeCount; i++) {
+        const c = document.getElementById(`cb_nl_${i}`);
+        if (c) c.checked = showNL;
+    }
+    const wrappers = document.querySelectorAll('.number-line-wrapper');
+    wrappers.forEach(w => w.style.display = showNL ? 'block' : 'none');
 }
 
 // Global format toggle from nav bar buttons

@@ -23,7 +23,7 @@
             <button class="lang-btn" onclick="generateRandomFraction()">隨機分數</button>
             <div class="controls-pill">
                 <label class="checkbox-label">
-                    <input type="checkbox" id="cb_toggle_nl" onchange="toggleNumberLine()"> 顯示數線
+                    <input type="checkbox" id="cb_toggle_nl" onchange="toggleNumberLine()" checked> 顯示數線
                 </label>
                 <div class="divider"></div>
                 <div class="speed-ctrl">
@@ -121,7 +121,7 @@
                         <div id="grid_process" style="pointer-events: none;"></div>
                     </div>
                     
-                    <div id="number_line_wrapper" class="number-line-wrapper" style="display: none; width: 100%;">
+                    <div id="number_line_wrapper" class="number-line-wrapper" style="display: block; width: 100%;">
                         <div class="number-line-container">
                             <div class="nl-line"></div>
                             <div id="nl_ticks"></div>
