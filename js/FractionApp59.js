@@ -196,10 +196,6 @@ function renderInputs() {
             : '';
         contentHtml += `
             <div class="card-controls">
-                <label class="checkbox-label card-cb">
-                    <input type="checkbox" id="cb_nl_${i}" onchange="toggleNumberLineCard(${i})" ${showNL ? 'checked' : ''}> 數線
-                </label>
-                <span class="card-divider"></span>
                 <button class="lang-btn card-fmt-btn" onclick="setFormatCard(${i}, 'integer')" style="${fmtActive('integer')}">整數</button>
                 <button class="lang-btn card-fmt-btn" onclick="setFormatCard(${i}, 'fraction')" style="${fmtActive('fraction')}">分數</button>
                 <button class="lang-btn card-fmt-btn" onclick="setFormatCard(${i}, 'mixed')" style="${fmtActive('mixed')}">帶分數</button>
